@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+  libp2p-node:
+    build: ./libp2p-Node
+    network_mode: host  
+    volumes:
+    - sharedSocket:/tmp/shared
+    - redisSock:/tmp/docker/
+    environment:
+      - NODE_NAME=debian #Ecco Box Namen eingeben
+      - DELETE_INTERVAL=30 #Tage
+
+  test-client:
+    build: ./eccoBoxClient
+    volumes:
+    - sharedSocket:/tmp/shared
+
+  redis:
+    image: redis:6.2   # Für ältere Debian Versionen (wie Raspbian): 6.2.0 sonst 6.2  # maybe change loglevel to warning
+    command: sh -c "chmod -R 777 /tmp/docker && chmod 777 /usr/lib/redis/modules/redistimeseries.so && redis-server /redis/etc/redis.conf" # sysctl vm.overcommit_memory=1
+    volumes:
+      - redisSock:/tmp/docker/
+      - redisData:/data
+      - ./redis/redistimeseries.so:/usr/lib/redis/modules/redistimeseries.so
+      - ./redis/redis.conf:/redis/etc/redis.conf
+
+volumes:
+  redisSock:
+  redisData:
+  sharedSocket:
+  
