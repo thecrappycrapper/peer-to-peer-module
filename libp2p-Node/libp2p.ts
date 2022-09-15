@@ -53,7 +53,7 @@ export class p2pNode {
 
         let root = this
 
-        //Einstellungen P2P
+        //Einstellungen libp2p
         this.node = await Libp2p.create({
             addresses: {
                 listen: ['/ip4/0.0.0.0/tcp/0']
@@ -80,11 +80,9 @@ export class p2pNode {
             }
         })
 
-        // start libp2p
         await this.node.start()
         console.log('libp2p has started')
         this.isReady = true
-
 
         this.node.on('error', (err) => {
             console.log('ERROR: '+ err)
@@ -95,7 +93,7 @@ export class p2pNode {
         })
 
         this.node.connectionManager.on('peer:connect', (connection) => {
-            console.log('Connected to %s', connection.remotePeer.toB58String()) // Log connected peer
+            console.log('Connected to %s', connection.remotePeer.toB58String()) 
             this.announceMyself()
         })
 
@@ -112,7 +110,7 @@ export class p2pNode {
                 const splitMessage = (msg.data).toString().split(" ", 2)
 
                 if (splitMessage[0] != root.myAddr && root.lookupService.register(multiaddr(splitMessage[0]), splitMessage[1])) { // if  we see a new addr
-                    root.announceMyself() //announce myself again
+                    root.announceMyself()
                 }
             }
             catch (e) {
@@ -138,14 +136,12 @@ export class p2pNode {
             let n = this.node
 
             pipe(
-                // Read from the stream (the source)
                 stream.source,
 
                 (source) => map(source, (buf) => toString(buf.slice())),
-                // Sink function
                 async function (source) {
                     let allData = ""
-                    // For each chunk of data
+
                     for await (let chunk of source) {
                         allData += chunk.toString()
                     }
@@ -182,31 +178,25 @@ export class p2pNode {
         this.publishLoop()
         this.delLoop()
 
-        //Antwort an udsServer weiterleiten
+        //Antwort aus dem Netz an udsServer weiterleiten
         await this.listener
         this.node.handle(`/response/1.0.0`, async ({ connection, stream, protocol }) => {
             pipe(
-                // Read from the stream (the source)
                 stream.source,
 
                 (source) => map(source, (buf) => toString(buf.slice())),
-                // Sink function
                 async function (source) {
-                    //console.log("start receiving")
                     let allData = ""
-                    // For each chunk of data
                     for await (let chunk of source) {
                         allData += chunk.toString()
-                        //console.log("Received chunk: " + chunk)
                     }
                     root.listener.respond(allData.toString())
                 }
             )
-            //this.unlisten(`/response:${responseId}/1.0.0`)
         })
     }
 
-    //Publishing in Bulks
+    //Menge der Publishes der letzten Sekunde publishen
     async publishLoop(){
         const sleep = (milliseconds : number) => {
             return new Promise(resolve => setTimeout(resolve, milliseconds))
@@ -223,7 +213,9 @@ export class p2pNode {
         }
     }
 
-    //Alle DELETION_TIMER ms zu alte Datensätze löschen
+    //Alle DELETION_TIMER Millisekunden zu alte Datensätze löschen
+    //Überprüft jede Stunde (angegeben in DELETION_TIMER), 
+    //ob zu alte Datensätze (definiert in Docker Compose) existieren und löscht diese.
     async delLoop(){
         const sleep = (milliseconds : number) => {
             return new Promise(resolve => setTimeout(resolve, milliseconds))
@@ -246,7 +238,7 @@ export class p2pNode {
         }
     }
 
-    //Im Netz anmelden
+    //Im Netz eigene Informationen für Lookup Services teilen
     async announceMyself() {
         if (this.myEccoBoxName != null) {
             await new Promise(resolve => setTimeout(resolve, 1000))
@@ -263,14 +255,10 @@ export class p2pNode {
         try {
             const { stream, protocol } = await n.dialProtocol(multiaddr(adr), `/response/1.0.0`)
             pipe(
-                // Read from stdin (the source)
                 Readable.from(obj),
 
                 (source) => (map(source, (string) => fromString(string))),
 
-                //lp.encode(),
-
-                // Write to the stream (the sink)
                 stream.sink
             )
         }
@@ -287,11 +275,12 @@ export class p2pNode {
 
         eccoBoxNames.push(...this.lookupService.getAllNames())
 
-        return JSON.parse(`{"type": "STATUS", 
-                "P2P-Connection": "${this.isReady}", 
-                "Redis": "${this.redis.ready}", 
-                "Local": "${this.myEccoBoxName}" , 
-                "Nodes": [${JSON.stringify(eccoBoxNames)}]}`)
+        return JSON.parse(`{
+                "type": "STATUS", 
+                "P2P-Connection": ${this.isReady}, 
+                "redis": "${this.redis.ready}", 
+                "local": "${this.myEccoBoxName}" , 
+                "nodes": [${JSON.stringify(eccoBoxNames)}]}`)
     }
 
     setListener(listener : SubListener){
@@ -299,6 +288,7 @@ export class p2pNode {
 
     }
 
+    //Anfragen an Redis Datenbank verarbeiten
     async get(eccoBoxName: String, query: String, eccoBoxClientId: String, messageId : String): Promise<String> {
         if(!this.isReady){
             console.log( "Can`t process request, Libp2p has not startet")
@@ -306,7 +296,7 @@ export class p2pNode {
         }
             
         try {
-            //wenn Command an lokale EccoBox gerichtet
+            //wenn Command an lokale EccoBox gerichtet, lokal abrufen
             if (this.myEccoBoxName == eccoBoxName) {
                 if(this.redis.ready){
 
@@ -325,7 +315,7 @@ export class p2pNode {
                     console.log("Redis-Client is not ready")
                 }
             } 
-            //wenn Command an remote EccoBox gerichtet
+            //wenn Command an remote EccoBox gerichtet, diesen an entsprechende Ecco Box weiterleiten
             else {
                 if (this.listener != null) {
                     if (this.lookupService.find(eccoBoxName).length > 0){
@@ -351,7 +341,6 @@ export class p2pNode {
 
 
     stop = async () => {
-        // stop libp2p
         await this.node.stop()
         console.log('libp2p has stopped')
         process.exit(0)
@@ -370,12 +359,10 @@ export class p2pNode {
                 this.listener.subscribeMessage(eccoBoxName, sensor, toString(msg.data))
             })
         }
-        console.log('I am subscribed to : %s', this.node.pubsub.getTopics())
     }
 
     unsubscribe(eccoBoxName:String, sensor: String) {
         this.node.pubsub.unsubscribe(eccoBoxName + "." + sensor)
-        console.log('I am subscribed to : %s', this.node.pubsub.getTopics())
     }
 
 
@@ -385,18 +372,16 @@ export class p2pNode {
         })
     }
 
-    //An Peer im Netz schicken
+    //An Peer im Netz ein Anfrage schicken
     async dial(msg: String, eccoBoxName: String ) {
 
         try {
             const { stream, protocol } = await this.node.dialProtocol(this.lookupService.find(eccoBoxName)[0].maddr, `/query/1.0.0`)
             pipe(
-                // Read from stdin (the source)
                 Readable.from(msg),
 
                 (source) => (map(source, (string) => fromString(string))),
 
-                // Write to the stream (the sink)
                 stream.sink
             )
         } catch (e) {
@@ -404,7 +389,4 @@ export class p2pNode {
         }
 
     }
-
-
-
 }

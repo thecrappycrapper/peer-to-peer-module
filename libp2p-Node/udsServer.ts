@@ -7,6 +7,7 @@ const fs = require('fs')
 
 const IPCPATH = path.join('/tmp/shared/', 'shared.sock') 
 
+//Verwaltet die Subscriptions eines Ecco Box Clients
 class Subscription {
     eccoBoxName: String;
     sensors: Array<String> = new Array<String>()
@@ -32,7 +33,7 @@ class Subscription {
     }
 
 }
-
+//Verbindung eines Clients mit Verwaltung der Subscriptions
 class EccoBoxClient {
     readonly connection: any;
     readonly id: String;
@@ -44,7 +45,6 @@ class EccoBoxClient {
         this.subscriptions = new Array<Subscription>();
         this.id = uuidv4();
     }
-
 
     addSubscriptions(eccoBoxName: String, sensor: String): String {
         if (!this.isSubscribed(eccoBoxName, sensor)) {
@@ -81,12 +81,13 @@ class EccoBoxClient {
     }
 }
 
+//Interface, welches der udsServer implementiert. Dient der Kommunikation einer libp2p Instanz mit dem udsServer
 export interface SubListener {
     subscribeMessage(eccoBoxName: String, sensor: String, msg: String),
     respond(msg: String)
 }
 
-
+//Schnittstelle zu Clients
 export class udsServer implements SubListener{
 
 
@@ -109,6 +110,7 @@ export class udsServer implements SubListener{
         this.deleteSocketFile()
 
         const server = net.createServer()
+
         server.on('connection', (socket) => {
 
             let newEccoBoxClient = new EccoBoxClient(socket);
@@ -172,11 +174,12 @@ export class udsServer implements SubListener{
         }
     }
 
-    //nachricht vom Client bearbeiten
+    //Nachricht vom Client bearbeiten
     processQuery(query: String, eccoBoxClientId: String) {
         let send = this.send
         let client = this.getEccoBoxClientFromId(eccoBoxClientId)
         let obj
+        //console.log(`Length of query: ${query.length}`)
         try{
             obj = JSON.parse(query.toString())
         }
@@ -212,12 +215,13 @@ export class udsServer implements SubListener{
         }
         //Bei Anfrage von Statusnachricht
         else if (obj.type == "STATUS"){
-            let tmp = this.p2p.getStatus()
+            let tmp : any = this.p2p.getStatus()
             tmp.msgId = obj.msgId;
             send(JSON.stringify(tmp), client)
         }
     }
 
+    //Behandeln von Antwort von Libp2p Instanz im Fall von Publish
     subscribeMessage(eccoBoxName: String, sensor: String,  msg: String){
         this.eccoBoxClients.forEach(client => {
             if (client.isSubscribed(eccoBoxName, sensor)) {
@@ -232,7 +236,8 @@ export class udsServer implements SubListener{
             }
         })
     }
-
+    
+    //Behandeln von Antwort von Libp2p Instanz im Fall einer Anfrage
     respond(msg: String){
         let obj = JSON.parse(msg.toString());
         const client = this.getEccoBoxClientFromId(obj.eccoBoxClientId)
@@ -255,7 +260,3 @@ export class udsServer implements SubListener{
         client.connection.write(msg + 'End\n')
     }
 }
-
-
-
-

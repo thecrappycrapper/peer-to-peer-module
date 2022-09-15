@@ -1,7 +1,4 @@
-import { inherits } from "util";
-
 var redis = require('redis');
-
 
 export class redisClient{
 
@@ -19,14 +16,13 @@ export class redisClient{
         this.client.on('ready', () => this.ready = true );
         this.client.on('end', () => this.ready = false );
 
-
         this.init()
     }
 
     async init(){
         await this.client.connect();
     }
-
+    //Anfrage an Redis Datenbank weiterleiten, Antwort zurückgeben
     async processQuery(msg: string){
         return await this.client.sendCommand(JSON.parse(msg))
     }

@@ -1,5 +1,6 @@
 import { Multiaddr } from "multiaddr";
 
+//Eintrag eines Peers
 class peerRefrence {
     maddr: Multiaddr
     eccoBoxName: String
@@ -8,6 +9,7 @@ class peerRefrence {
         this.eccoBoxName = name
     }
 }
+
 export class lookupService {
     peerRefrences: Array<peerRefrence> = new Array()
 
@@ -20,7 +22,7 @@ export class lookupService {
     register(maddr: Multiaddr, eccoBoxName: String): Boolean {
         let register = true
 
-        if (this.peerRefrences.some(element => { return element.maddr.equals(maddr) })) //if see new maddr return true => send all my metadata
+        if (this.peerRefrences.some(element => { return element.maddr.equals(maddr) })) 
             register = false
 
         if (!this.peerRefrences.some(element => { return element.maddr.equals(maddr)})) {
