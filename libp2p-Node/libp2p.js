@@ -69,11 +69,8 @@ var p2pNode = /** @class */ (function () {
         this.stop = function () { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: 
-                    // stop libp2p
-                    return [4 /*yield*/, this.node.stop()];
+                    case 0: return [4 /*yield*/, this.node.stop()];
                     case 1:
-                        // stop libp2p
                         _a.sent();
                         console.log('libp2p has stopped');
                         process.exit(0);
@@ -99,7 +96,7 @@ var p2pNode = /** @class */ (function () {
                 switch (_b.label) {
                     case 0:
                         root = this;
-                        //Einstellungen P2P
+                        //Einstellungen libp2p
                         _a = this;
                         return [4 /*yield*/, Libp2p.create({
                                 addresses: {
@@ -125,16 +122,12 @@ var p2pNode = /** @class */ (function () {
                                         dialTimeout: 3000
                                     }
                                 }
-                            })
-                            // start libp2p
-                        ];
+                            })];
                     case 1:
-                        //Einstellungen P2P
+                        //Einstellungen libp2p
                         _a.node = _b.sent();
-                        // start libp2p
                         return [4 /*yield*/, this.node.start()];
                     case 2:
-                        // start libp2p
                         _b.sent();
                         console.log('libp2p has started');
                         this.isReady = true;
@@ -145,7 +138,7 @@ var p2pNode = /** @class */ (function () {
                             console.log('Found a peer in the local network', peerData.id.toB58String(), peerData.multiaddrs);
                         });
                         this.node.connectionManager.on('peer:connect', function (connection) {
-                            console.log('Connected to %s', connection.remotePeer.toB58String()); // Log connected peer
+                            console.log('Connected to %s', connection.remotePeer.toB58String());
                             _this.announceMyself();
                         });
                         this.node.connectionManager.on('peer:disconnect', function (connection) {
@@ -159,7 +152,7 @@ var p2pNode = /** @class */ (function () {
                             try {
                                 var splitMessage = (msg.data).toString().split(" ", 2);
                                 if (splitMessage[0] != root.myAddr && root.lookupService.register(multiaddr(splitMessage[0]), splitMessage[1])) { // if  we see a new addr
-                                    root.announceMyself(); //announce myself again
+                                    root.announceMyself();
                                 }
                             }
                             catch (e) {
@@ -186,11 +179,7 @@ var p2pNode = /** @class */ (function () {
                                 return __generator(this, function (_b) {
                                     resp = this.response;
                                     n = this.node;
-                                    pipe(
-                                    // Read from the stream (the source)
-                                    stream.source, function (source) { return map(source, function (buf) { return toString(buf.slice()); }); }, 
-                                    // Sink function
-                                    function (source) {
+                                    pipe(stream.source, function (source) { return map(source, function (buf) { return toString(buf.slice()); }); }, function (source) {
                                         var source_1, source_1_1;
                                         var e_1, _a;
                                         return __awaiter(this, void 0, void 0, function () {
@@ -253,20 +242,16 @@ var p2pNode = /** @class */ (function () {
                         process.on('SIGINT', this.stop);
                         this.publishLoop();
                         this.delLoop();
-                        //Antwort an udsServer weiterleiten
+                        //Antwort aus dem Netz an udsServer weiterleiten
                         return [4 /*yield*/, this.listener];
                     case 3:
-                        //Antwort an udsServer weiterleiten
+                        //Antwort aus dem Netz an udsServer weiterleiten
                         _b.sent();
                         this.node.handle("/response/1.0.0", function (_a) {
                             var connection = _a.connection, stream = _a.stream, protocol = _a.protocol;
                             return __awaiter(_this, void 0, void 0, function () {
                                 return __generator(this, function (_b) {
-                                    pipe(
-                                    // Read from the stream (the source)
-                                    stream.source, function (source) { return map(source, function (buf) { return toString(buf.slice()); }); }, 
-                                    // Sink function
-                                    function (source) {
+                                    pipe(stream.source, function (source) { return map(source, function (buf) { return toString(buf.slice()); }); }, function (source) {
                                         var source_2, source_2_1;
                                         var e_2, _a;
                                         return __awaiter(this, void 0, void 0, function () {
@@ -320,7 +305,7 @@ var p2pNode = /** @class */ (function () {
             });
         });
     };
-    //Publishing in Bulks
+    //Menge der Publishes der letzten Sekunde publishen
     p2pNode.prototype.publishLoop = function () {
         return __awaiter(this, void 0, void 0, function () {
             var sleep, topic, topicCopy;
@@ -349,7 +334,9 @@ var p2pNode = /** @class */ (function () {
             });
         });
     };
-    //Alle DELETION_TIMER ms zu alte Datensätze löschen
+    //Alle DELETION_TIMER Millisekunden zu alte Datensätze löschen
+    //Überprüft jede Stunde (angegeben in DELETION_TIMER), 
+    //ob zu alte Datensätze (definiert in Docker Compose) existieren und löscht diese.
     p2pNode.prototype.delLoop = function () {
         return __awaiter(this, void 0, void 0, function () {
             var sleep, _loop_1, this_1;
@@ -395,7 +382,7 @@ var p2pNode = /** @class */ (function () {
             });
         });
     };
-    //Im Netz anmelden
+    //Im Netz eigene Informationen für Lookup Services teilen
     p2pNode.prototype.announceMyself = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -428,12 +415,7 @@ var p2pNode = /** @class */ (function () {
                         return [4 /*yield*/, n.dialProtocol(multiaddr(adr), "/response/1.0.0")];
                     case 1:
                         _a = _b.sent(), stream = _a.stream, protocol = _a.protocol;
-                        pipe(
-                        // Read from stdin (the source)
-                        stream_1.Readable.from(obj), function (source) { return (map(source, function (string) { return fromString(string); })); }, 
-                        //lp.encode(),
-                        // Write to the stream (the sink)
-                        stream.sink);
+                        pipe(stream_1.Readable.from(obj), function (source) { return (map(source, function (string) { return fromString(string); })); }, stream.sink);
                         return [3 /*break*/, 3];
                     case 2:
                         e_3 = _b.sent();
@@ -449,11 +431,12 @@ var p2pNode = /** @class */ (function () {
         if (this.myEccoBoxName != null)
             eccoBoxNames.push(this.myEccoBoxName);
         eccoBoxNames.push.apply(eccoBoxNames, this.lookupService.getAllNames());
-        return JSON.parse("{\"type\": \"STATUS\", \n                \"P2P-Connection\": \"".concat(this.isReady, "\", \n                \"Redis\": \"").concat(this.redis.ready, "\", \n                \"Local\": \"").concat(this.myEccoBoxName, "\" , \n                \"Nodes\": [").concat(JSON.stringify(eccoBoxNames), "]}"));
+        return JSON.parse("{\n                \"type\": \"STATUS\", \n                \"P2P-Connection\": ".concat(this.isReady, ", \n                \"redis\": \"").concat(this.redis.ready, "\", \n                \"local\": \"").concat(this.myEccoBoxName, "\" , \n                \"nodes\": [").concat(JSON.stringify(eccoBoxNames), "]}"));
     };
     p2pNode.prototype.setListener = function (listener) {
         this.listener = listener;
     };
+    //Anfragen an Redis Datenbank verarbeiten
     p2pNode.prototype.get = function (eccoBoxName, query, eccoBoxClientId, messageId) {
         return __awaiter(this, void 0, void 0, function () {
             var obj, err_1;
@@ -516,18 +499,16 @@ var p2pNode = /** @class */ (function () {
                 _this.listener.subscribeMessage(eccoBoxName, sensor, toString(msg.data));
             });
         }
-        console.log('I am subscribed to : %s', this.node.pubsub.getTopics());
     };
     p2pNode.prototype.unsubscribe = function (eccoBoxName, sensor) {
         this.node.pubsub.unsubscribe(eccoBoxName + "." + sensor);
-        console.log('I am subscribed to : %s', this.node.pubsub.getTopics());
     };
     p2pNode.prototype.publish = function (sensor, msg) {
         this.node.pubsub.publish(this.myEccoBoxName + "." + sensor, fromString(msg))["catch"](function (err) {
             console.error(err);
         });
     };
-    //An Peer im Netz schicken
+    //An Peer im Netz ein Anfrage schicken
     p2pNode.prototype.dial = function (msg, eccoBoxName) {
         return __awaiter(this, void 0, void 0, function () {
             var _a, stream, protocol, e_4;
@@ -538,11 +519,7 @@ var p2pNode = /** @class */ (function () {
                         return [4 /*yield*/, this.node.dialProtocol(this.lookupService.find(eccoBoxName)[0].maddr, "/query/1.0.0")];
                     case 1:
                         _a = _b.sent(), stream = _a.stream, protocol = _a.protocol;
-                        pipe(
-                        // Read from stdin (the source)
-                        stream_1.Readable.from(msg), function (source) { return (map(source, function (string) { return fromString(string); })); }, 
-                        // Write to the stream (the sink)
-                        stream.sink);
+                        pipe(stream_1.Readable.from(msg), function (source) { return (map(source, function (string) { return fromString(string); })); }, stream.sink);
                         return [3 /*break*/, 3];
                     case 2:
                         e_4 = _b.sent();

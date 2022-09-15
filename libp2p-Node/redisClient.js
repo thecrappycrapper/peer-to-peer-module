@@ -63,6 +63,7 @@ var redisClient = /** @class */ (function () {
             });
         });
     };
+    //Anfrage an Redis Datenbank weiterleiten, Antwort zurückgeben
     redisClient.prototype.processQuery = function (msg) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {

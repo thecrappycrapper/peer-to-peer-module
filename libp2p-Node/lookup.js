@@ -1,6 +1,7 @@
 "use strict";
 exports.__esModule = true;
 exports.lookupService = void 0;
+//Eintrag eines Peers
 var peerRefrence = /** @class */ (function () {
     function peerRefrence(maddr, name) {
         this.maddr = maddr;
@@ -19,7 +20,7 @@ var lookupService = /** @class */ (function () {
     };
     lookupService.prototype.register = function (maddr, eccoBoxName) {
         var register = true;
-        if (this.peerRefrences.some(function (element) { return element.maddr.equals(maddr); })) //if see new maddr return true => send all my metadata
+        if (this.peerRefrences.some(function (element) { return element.maddr.equals(maddr); }))
             register = false;
         if (!this.peerRefrences.some(function (element) { return element.maddr.equals(maddr); })) {
             this.unregister(maddr.toString().substring(maddr.toString().lastIndexOf('/') + 1, maddr.toString().length));

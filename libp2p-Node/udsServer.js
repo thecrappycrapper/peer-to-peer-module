@@ -6,6 +6,7 @@ var uuid_1 = require("uuid");
 var net = require('net');
 var fs = require('fs');
 var IPCPATH = path.join('/tmp/shared/', 'shared.sock');
+//Verwaltet die Subscriptions eines Ecco Box Clients
 var Subscription = /** @class */ (function () {
     function Subscription(name) {
         this.sensors = new Array();
@@ -27,6 +28,7 @@ var Subscription = /** @class */ (function () {
     };
     return Subscription;
 }());
+//Verbindung eines Clients mit Verwaltung der Subscriptions
 var EccoBoxClient = /** @class */ (function () {
     function EccoBoxClient(connect) {
         this.connection = connect;
@@ -66,6 +68,7 @@ var EccoBoxClient = /** @class */ (function () {
     };
     return EccoBoxClient;
 }());
+//Schnittstelle zu Clients
 var udsServer = /** @class */ (function () {
     function udsServer(p2p) {
         this.eccoBoxClients = new Array();
@@ -137,11 +140,12 @@ var udsServer = /** @class */ (function () {
                 console.error(err);
         }
     };
-    //nachricht vom Client bearbeiten
+    //Nachricht vom Client bearbeiten
     udsServer.prototype.processQuery = function (query, eccoBoxClientId) {
         var send = this.send;
         var client = this.getEccoBoxClientFromId(eccoBoxClientId);
         var obj;
+        //console.log(`Length of query: ${query.length}`)
         try {
             obj = JSON.parse(query.toString());
         }
@@ -174,6 +178,7 @@ var udsServer = /** @class */ (function () {
             send(JSON.stringify(tmp), client);
         }
     };
+    //Behandeln von Antwort von Libp2p Instanz im Fall von Publish
     udsServer.prototype.subscribeMessage = function (eccoBoxName, sensor, msg) {
         var _this = this;
         this.eccoBoxClients.forEach(function (client) {
@@ -186,6 +191,7 @@ var udsServer = /** @class */ (function () {
             }
         });
     };
+    //Behandeln von Antwort von Libp2p Instanz im Fall einer Anfrage
     udsServer.prototype.respond = function (msg) {
         var obj = JSON.parse(msg.toString());
         var client = this.getEccoBoxClientFromId(obj.eccoBoxClientId);

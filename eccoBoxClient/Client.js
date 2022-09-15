@@ -67,6 +67,7 @@ var clientClass = /** @class */ (function () {
             });
         });
     };
+    //Verwalten der UDS Verbindung 
     clientClass.prototype.setUp = function () {
         var _this = this;
         var chunks = [];
@@ -75,6 +76,7 @@ var clientClass = /** @class */ (function () {
             console.log('Connected to P2P Module');
             _this.executeScript(client);
         });
+        //Zusammenfügen und Aufteilen empfangener Daten
         client.on('data', function (chunk) {
             var chunkArr = chunk.toString().split('End\n');
             if (chunk.toString == 'End\n') {
@@ -120,6 +122,7 @@ var clientClass = /** @class */ (function () {
         });
         client.on('drain', function () { return console.log('drain'); });
     };
+    //Verarbeiten empfangener Daten
     clientClass.prototype.processData = function (combinedData) {
         var obj;
         try {
@@ -130,24 +133,13 @@ var clientClass = /** @class */ (function () {
             console.error("Caught JSON Parse Error. Count: " + this.errors);
             return;
         }
-        if (obj.type == "Command") { // &&  parseInt(obj.data) % 1000 == 0){
-            console.log("Combined------------------------\n: ");
-            console.log(obj);
-        }
-        else if (obj.type == "SUB") { // &&  parseInt(obj.data.split(',')[0]) % 1000 == 0){
-            console.log("Combined------------------------\n: ");
-            console.log(obj);
-        }
-        else if (obj.type == "STATUS") {
-            console.log("Combined------------------------\n: ");
-            console.log(obj);
-        }
+        console.log("Nachricht------------------------\n: ");
+        console.log(obj);
     };
     clientClass.prototype.send = function (msg, client) {
-        //const readable = Readable.from(msg + 'End\n')
-        //readable.pipe(client, { end: false })
         client.write(msg + 'End\n');
     };
+    //Wiederholt einen Command. Möglichkeit ein verhalten abhängig von interator zu definieren
     clientClass.prototype.cycle = function (client, sendFunction, commandFunction, interval) {
         return __awaiter(this, void 0, void 0, function () {
             var iterator;
@@ -169,8 +161,7 @@ var clientClass = /** @class */ (function () {
             });
         });
     };
-    //s((`{"type": "Command", "msgId": "${uuidv4()}", "eccoBoxName": "debian", "command": ${JSON.stringify(["TS.ADD", "temperatur", "\*", `${iterator.toString()}`])}}`), client)
-    //s((`{"type": "Command", "msgId": "${uuidv4()}", "eccoBoxName": "debian", "command": ${JSON.stringify(["TS.ADD", "humidity", "\*", `${iterator.toString()}`])}}`), client)
+    //Testfall auswählen
     clientClass.prototype.executeScript = function (connection) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -184,11 +175,14 @@ var clientClass = /** @class */ (function () {
             });
         });
     };
+    //Lokale Tests---------------------------------------------
+    //Speichert Datensatz und fragt diesen wieder ab
     clientClass.prototype.test1local = function (connection) {
         console.log(">>Saving temperature of 14 to TSDB");
         this.send(("\n            {\"type\": \"Command\", \n            \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n            \"eccoBoxName\": \"").concat(LOCAL_ECCO_BOX_NAME, "\", \n            \"command\": ").concat(JSON.stringify(["TS.ADD", "temperatur", "\*", "14"]), "}")), connection);
         this.send(("\n            {\"type\": \"Command\", \n            \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n            \"eccoBoxName\": \"").concat(LOCAL_ECCO_BOX_NAME, "\", \n            \"command\": ").concat(JSON.stringify(["TS.GET", "temperatur"]), "}")), connection);
     };
+    //Speichert eine Reihe von Datensätzen und fragt diese ab
     clientClass.prototype.test2local = function (connection) {
         return __awaiter(this, void 0, void 0, function () {
             var i;
@@ -214,8 +208,10 @@ var clientClass = /** @class */ (function () {
             });
         });
     };
-    //--------Remote speichern Testfall
-    //Speichern auf Pi, ausführen Debian
+    //Tests über mehrere Edge Nodes--------------------------------------
+    //Speichert alle 3s, holt diesen Datensatz alle
+    //Holt sich weiteren lokalen Datensatz, der von anderer Node gespeichert wurde
+    //Ausführende Edge Node: Pi
     clientClass.prototype.Atest1remote = function (connection) {
         this.cycle(connection, this.send, function (iterator) {
             return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"pi\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "temperatur", "".concat(Date.now()), iterator.toString()]), "}");
@@ -227,7 +223,8 @@ var clientClass = /** @class */ (function () {
             return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"pi\", \n                    \"command\": ").concat(JSON.stringify(["TS.GET", "distanz"]), "}");
         }, 3000);
     };
-    //Speichern und abrufen Pi, ausführen Pi
+    //Speichert auf Node mit Namen pi Datensatz und holt sich Datensätze von zwei keys dieser Node
+    //Ausführende Edge Node Name: nicht pi
     clientClass.prototype.Btest1remote = function (connection) {
         this.cycle(connection, this.send, function (iterator) {
             return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"pi\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "distanz", "".concat(Date.now()), (iterator * iterator).toString()]), "}");
@@ -240,46 +237,243 @@ var clientClass = /** @class */ (function () {
         }, 3000);
     };
     //-----Pub/Sub Testfall
-    //Ausführen Debian
+    //Abonniert sich auf lokalen sensor
+    //Ausführender Edge Node Name: pi
     clientClass.prototype.Atest2remote = function (connection) {
         this.send(("\n            {\"type\": \"SUB\",\n            \"eccoBoxName\": \"pi\", \n            \"sensor\": \"distanz\"}"), connection);
     };
-    //Ausführen Pi
+    //Sendet auf andere Node Datensatz
+    //Ausführender Edge Node Name: nicht pi
     clientClass.prototype.Btest2remote = function (connection) {
         this.cycle(connection, this.send, function (iterator) {
             return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"pi\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "distanz", "".concat(Date.now()), (iterator).toString()]), "}");
         }, 3000);
     };
     //Alle 10ms über Pub/Sub
-    //Ausführen Debian
+    //Abonniert lokalen sensor
+    //Ausführender Edge Node Name: pi
     clientClass.prototype.Atest3remote = function (connection) {
         this.send(("\n            {\"type\": \"SUB\",\n            \"eccoBoxName\": \"pi\", \n            \"sensor\": \"distanz\"}"), connection);
     };
-    //Ausführen Pi
+    //Sendet alle 10ms Datensatz auf andere Node
+    //Ausführender Edge Node Name: nicht pi
     clientClass.prototype.Btest3remote = function (connection) {
         this.cycle(connection, this.send, function (iterator) {
             return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"pi\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "distanz", "".concat(Date.now()), (iterator).toString()]), "}");
         }, 10);
     };
     //------Kontinuierlich 10ms Daten speichern und größere Menge von Daten abrufen
-    //Ausführen Debian
+    //Holt Datensätze der letzten 10s eines lokalen Sensors
+    //Ausführender Edge Node Name: pi
     clientClass.prototype.Atest4remote = function (connection) {
         this.cycle(connection, this.send, function (iterator) {
             return "\n            {\"type\": \"Command\", \n            \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n            \"eccoBoxName\": \"pi\", \n            \"command\": ").concat(JSON.stringify(["TS.RANGE", "distanz", "".concat(Date.now() - 10000), "".concat(Date.now())]), "}");
         }, 10000);
     };
-    //Ausführen Pi
+    //Sendet Daten auf entfernte Node
+    //Ausführender Edge Node Name: nicht pi
     clientClass.prototype.Btest4remote = function (connection) {
         this.cycle(connection, this.send, function (iterator) {
             return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"pi\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "distanz", "".concat(Date.now()), (iterator).toString()]), "}");
         }, 10);
     };
+    //-----Status Test
+    //Fragt Status des Netzes + der lokalen Node ab.
+    //Ausführender Edge Node Name: Pi
     clientClass.prototype.Atest5remote = function (connection) {
         this.cycle(connection, this.send, function (iterator) {
             return "{\"type\": \"Status\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\"}");
         }, 5000);
     };
+    //Macht nichts
+    //Ausführender Edge Node Name: nicht pi
     clientClass.prototype.Btest5remote = function (connection) { };
+    //Tests in größeren Netzen----------------------------------
+    //Test6: Speichern und abrufen von allen, einer abonniert abwechselnd
+    //Lokal Datensätze hinzufügen, bei der nächsten Node Datensätze alle 20ms abrufen
+    //Ausführender Edge Node Name: node1
+    clientClass.prototype.Atest6remote = function (connection) {
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node1\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "sensorname", "".concat(Date.now()), (iterator).toString()]), "}");
+        }, 20);
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node2\", \n                    \"command\": ").concat(JSON.stringify(["TS.GET", "sensorname"]), "}");
+        }, 20);
+    };
+    //Lokal Datensätze hinzufügen, bei der nächsten Node Datensätze alle 20ms abrufen
+    //Ausführender Edge Node Name: node2
+    clientClass.prototype.Btest6remote = function (connection) {
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node2\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "sensorname", "".concat(Date.now()), (iterator).toString()]), "}");
+        }, 20);
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node3\", \n                    \"command\": ").concat(JSON.stringify(["TS.GET", "sensorname"]), "}");
+        }, 20);
+    };
+    //Lokal Datensätze hinzufügen, bei der nächsten Node Datensätze alle 20ms abrufen
+    //Ausführender Edge Node Name: node3
+    clientClass.prototype.Ctest6remote = function (connection) {
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node3\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "sensorname", "".concat(Date.now()), (iterator).toString()]), "}");
+        }, 20);
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node4\", \n                    \"command\": ").concat(JSON.stringify(["TS.GET", "sensorname"]), "}");
+        }, 20);
+    };
+    //Lokal Datensätze hinzufügen, bei der nächsten Node Datensätze alle 20ms abrufen
+    //Ausführender Edge Node Name: node4
+    clientClass.prototype.Dtest6remote = function (connection) {
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node4\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "sensorname", "".concat(Date.now()), (iterator).toString()]), "}");
+        }, 20);
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node5\", \n                    \"command\": ").concat(JSON.stringify(["TS.GET", "sensorname"]), "}");
+        }, 20);
+    };
+    //Lokal Datensätze hinzufügen, bei der nächsten Node Datensätze alle 20ms abrufen
+    //Ausführender Edge Node Name: node5
+    clientClass.prototype.Etest6remote = function (connection) {
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node5\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "sensorname", "".concat(Date.now()), (iterator).toString()]), "}");
+        }, 20);
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node1\", \n                    \"command\": ").concat(JSON.stringify(["TS.GET", "sensorname"]), "}");
+        }, 20);
+    };
+    //Fragt zuerst den Status an, danach geht es die anderen Nodes durch und fragt jeweils Datensätze ab, 
+    //subscribet sich kurzzeitig und unsubscribet sich danach
+    //Ausführender Edge Node Name: node6
+    clientClass.prototype.Ftest6remote = function (connection) {
+        return __awaiter(this, void 0, void 0, function () {
+            var currNodeNumber;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.send(("\n            {\"type\": \"Status\",\n            \"msgId\": \"".concat((0, uuid_1.v4)(), "\"}")), connection);
+                        return [4 /*yield*/, sleep(5000)];
+                    case 1:
+                        _a.sent();
+                        currNodeNumber = 0;
+                        _a.label = 2;
+                    case 2:
+                        if (!true) return [3 /*break*/, 6];
+                        return [4 /*yield*/, sleep(100)];
+                    case 3:
+                        _a.sent();
+                        console.log("Now getting the last 2s of Data at Node ".concat(currNodeNumber % 5 + 1));
+                        this.send("\n                {\"type\": \"Command\", \n                \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                \"eccoBoxName\": \"node").concat(currNodeNumber % 5 + 1, "\", \n                \"command\": ").concat(JSON.stringify(["TS.RANGE", "sensorname", "".concat(Date.now() - 2000), "".concat(Date.now())]), "}"), connection);
+                        return [4 /*yield*/, sleep(1000)];
+                    case 4:
+                        _a.sent();
+                        console.log("Now Subscribing to Node ".concat(currNodeNumber % 5));
+                        this.send(("\n                {\"type\": \"SUB\",\n                \"eccoBoxName\":\"node".concat(currNodeNumber % 5 + 1, "\", \n                \"sensor\": \"sensorname\"}")), connection);
+                        return [4 /*yield*/, sleep(2000)];
+                    case 5:
+                        _a.sent();
+                        this.send(("\n                {\"type\": \"UNSUB\",\n                \"eccoBoxName\":\"node".concat(currNodeNumber % 5 + 1, "\", \n                \"sensor\": \"sensorname\"}")), connection);
+                        currNodeNumber = (currNodeNumber + 1) % 5;
+                        return [3 /*break*/, 2];
+                    case 6: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    //Testfall: Komplexes Großes Netz
+    //Lokal und entfernt Datensätze alle 100ms hinzufügen
+    //Ausführender Edge Node Name: node1
+    clientClass.prototype.Atest7remote = function (connection) {
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node1\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "sensor1", "".concat(Date.now()), (iterator).toString()]), "}");
+        }, 100);
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node2\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "sensor1", "".concat(Date.now()), (iterator).toString()]), "}");
+        }, 100);
+    };
+    //Fügt lokal alle 100ms Datensätze hinzu
+    //Ausführender Edge Node Name: node2
+    clientClass.prototype.Btest7remote = function (connection) {
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node2\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "sensor2", "".concat(Date.now()), (iterator).toString()]), "}");
+        }, 100);
+    };
+    //Fügt bei Node2 alle 100ms Datensätze hinzu
+    //Ausführender Edge Node Name: node3
+    clientClass.prototype.Ctest7remote = function (connection) {
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node2\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "sensor3", "".concat(Date.now()), (iterator).toString()]), "}");
+        }, 100);
+    };
+    //Fügt bei Node1 und Node2 alle 100ms Datensätze hinzu
+    //Ausführender Edge Node Name: node4
+    clientClass.prototype.Dtest7remote = function (connection) {
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node2\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "sensor4", "".concat(Date.now()), (iterator).toString()]), "}");
+        }, 100);
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node1\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "sensor2", "".concat(Date.now()), (iterator).toString()]), "}");
+        }, 100);
+    };
+    //Fügt bei Node1 und Node2 alle 100ms Datensätze hinzu
+    //Ausführender Edge Node Name: node5
+    clientClass.prototype.Etest7remote = function (connection) {
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node2\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "sensor5", "".concat(Date.now()), (iterator).toString()]), "}");
+        }, 100);
+        this.cycle(connection, this.send, function (iterator) {
+            return "{\"type\": \"Command\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"node1\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "sensor3", "".concat(Date.now()), (iterator).toString()]), "}");
+        }, 100);
+    };
+    //Fragt zuerst den Status ab. Danach geht in Node1 und Node2 abwechselnd alle Sensoren durch, dabei
+    //werden zuerst die Sensordaten der letzten 2s abgefragt, danach kurz subscribet und danach wieder unsubscribet.
+    //Ausführender Edge Node Name: node6
+    clientClass.prototype.Ftest7remote = function (connection) {
+        return __awaiter(this, void 0, void 0, function () {
+            var nodeNumber, sensorNumber;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.send(("\n            {\"type\": \"Status\",\n            \"msgId\": \"".concat((0, uuid_1.v4)(), "\"}")), connection);
+                        return [4 /*yield*/, sleep(5000)];
+                    case 1:
+                        _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        if (!true) return [3 /*break*/, 11];
+                        nodeNumber = 1;
+                        _a.label = 3;
+                    case 3:
+                        if (!(nodeNumber <= 2)) return [3 /*break*/, 10];
+                        sensorNumber = 1;
+                        _a.label = 4;
+                    case 4:
+                        if (!(sensorNumber <= ((nodeNumber == 0) ? 3 : 5))) return [3 /*break*/, 9];
+                        return [4 /*yield*/, sleep(100)];
+                    case 5:
+                        _a.sent();
+                        console.log("Now getting the last 2s of Data at Node ".concat(nodeNumber));
+                        this.send("\n                        {\"type\": \"Command\", \n                        \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                        \"eccoBoxName\": \"node").concat(nodeNumber, "\", \n                        \"command\": ").concat(JSON.stringify(["TS.RANGE", "sensor".concat(sensorNumber), "".concat(Date.now() - 2000), "".concat(Date.now())]), "}"), connection);
+                        return [4 /*yield*/, sleep(1000)];
+                    case 6:
+                        _a.sent();
+                        console.log("Now Subscribing to Node ".concat(nodeNumber, ", Sensor Number: ").concat(sensorNumber));
+                        this.send(("\n                        {\"type\": \"SUB\",\n                        \"eccoBoxName\":\"node".concat(nodeNumber, "\", \n                        \"sensor\": \"sensor").concat(sensorNumber, "\"}")), connection);
+                        return [4 /*yield*/, sleep(2000)];
+                    case 7:
+                        _a.sent();
+                        this.send(("\n                        {\"type\": \"UNSUB\",\n                        \"eccoBoxName\":\"node".concat(nodeNumber, "\", \n                        \"sensor\": \"sensor").concat(sensorNumber, "\"}")), connection);
+                        _a.label = 8;
+                    case 8:
+                        sensorNumber++;
+                        return [3 /*break*/, 4];
+                    case 9:
+                        nodeNumber++;
+                        return [3 /*break*/, 3];
+                    case 10: return [3 /*break*/, 2];
+                    case 11: return [2 /*return*/];
+                }
+            });
+        });
+    };
     return clientClass;
 }());
 exports.clientClass = clientClass;
