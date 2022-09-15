@@ -155,9 +155,9 @@ var udsServer = /** @class */ (function () {
             return;
         }
         //Bei Command an irgendeine Redis Datenbank
-        if (obj.type == "Command") {
+        if (obj.type == "COMMAND") {
             this.p2p.get(obj.eccoBoxName, JSON.stringify(obj.command), eccoBoxClientId, obj.msgId).then(function (value) {
-                send("{\"type\": \"Command\", \n                    \"msgId\": \"".concat(obj.msgId, "\",\n                    \"eccoBoxName\": \"").concat(obj.eccoBoxName, "\", \n                    \"data\": \"").concat(value, "\"}"), client);
+                send("{\"type\": \"COMMAND\", \n                    \"msgId\": \"".concat(obj.msgId, "\",\n                    \"eccoBoxName\": \"").concat(obj.eccoBoxName, "\", \n                    \"data\": \"").concat(value, "\"}"), client);
             }, function (err) {
                 send("{\"type\": \"ERROR\",\n                    \"msgId\": \"".concat(obj.msgId, "\" \n                    \"eccoBoxName\": \"").concat(obj.eccoBoxName, "\"}"), client);
             });
