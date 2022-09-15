@@ -97,7 +97,7 @@ export class clientClass {
             console.error("Caught JSON Parse Error. Count: " + this.errors)
             return
         }
-        console.log("Nachricht------------------------\n: ")
+        console.log("Nachricht------------------------:\n ")
         console.log(obj)
     }
 
