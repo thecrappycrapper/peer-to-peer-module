@@ -150,7 +150,7 @@ export class p2pNode {
 
                     root.get(commands.eccoBoxName, JSON.stringify(commands.query), commands.eccoBoxClientId, commands.msgId).then(function (value) {
  
-                        resp(commands.addr, `{"type": "Command", 
+                        resp(commands.addr, `{"type": "COMMAND", 
                                             "msgId" : "${commands.msgId}",
                                             "eccoBoxName": "${root.myEccoBoxName}", 
                                             "data": ${JSON.stringify(value)}, 

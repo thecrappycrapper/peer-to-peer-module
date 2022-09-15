@@ -190,9 +190,9 @@ export class udsServer implements SubListener{
         }
         
         //Bei Command an irgendeine Redis Datenbank
-        if(obj.type == "Command"){
+        if(obj.type == "COMMAND"){
             this.p2p.get(obj.eccoBoxName, JSON.stringify(obj.command), eccoBoxClientId, obj.msgId).then(function (value) {
-                send(`{"type": "Command", 
+                send(`{"type": "COMMAND", 
                     "msgId": "${obj.msgId}",
                     "eccoBoxName": "${obj.eccoBoxName}", 
                     "data": "${value}"}`, 

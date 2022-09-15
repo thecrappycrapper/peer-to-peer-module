@@ -124,14 +124,14 @@ export class clientClass {
     test1local(connection){
         console.log(">>Saving temperature of 14 to TSDB")
         this.send((`
-            {"type": "Command", 
+            {"type": "COMMAND", 
             "msgId": "${uuidv4()}", 
             "eccoBoxName": "${LOCAL_ECCO_BOX_NAME}", 
             "command": ${JSON.stringify(["TS.ADD", "temperatur", "\*", `14`])}}`), 
         connection)
 
         this.send((`
-            {"type": "Command", 
+            {"type": "COMMAND", 
             "msgId": "${uuidv4()}", 
             "eccoBoxName": "${LOCAL_ECCO_BOX_NAME}", 
             "command": ${JSON.stringify(["TS.GET", "temperatur"])}}`), 
@@ -141,7 +141,7 @@ export class clientClass {
     async test2local(connection){
         for(let i = 15; i < 23; i++){
             this.send((`
-                {"type": "Command", 
+                {"type": "COMMAND", 
                 "msgId": "${uuidv4()}", 
                 "eccoBoxName": "${LOCAL_ECCO_BOX_NAME}", 
                 "command": ${JSON.stringify(["TS.ADD", "temperatur", `${Date.now()}`, i.toString()])}}`), 
@@ -150,7 +150,7 @@ export class clientClass {
         }
 
         this.send((`
-            {"type": "Command", 
+            {"type": "COMMAND", 
             "msgId": "${uuidv4()}", 
             "eccoBoxName": "${LOCAL_ECCO_BOX_NAME}", 
             "command": ${JSON.stringify(["TS.RANGE", "temperatur", "0", "2000000000000"])}}`), 
@@ -163,20 +163,20 @@ export class clientClass {
     //Ausführende Edge Node: Pi
     Atest1remote(connection){
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "pi", 
                     "command": ${JSON.stringify(["TS.ADD", "temperatur",`${Date.now()}` ,iterator.toString()])}}`
         }, 3000)
 
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "pi", 
                     "command": ${JSON.stringify(["TS.GET", "temperatur"])}}`
         }, 3000)
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "pi", 
                     "command": ${JSON.stringify(["TS.GET", "distanz"])}}`
@@ -187,19 +187,19 @@ export class clientClass {
     //Ausführende Edge Node Name: nicht pi
     Btest1remote(connection){
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "pi", 
                     "command": ${JSON.stringify(["TS.ADD", "distanz",`${Date.now()}` ,(iterator*iterator).toString()])}}`
         }, 3000)
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "pi", 
                     "command": ${JSON.stringify(["TS.GET", "temperatur"])}}`
         }, 3000)
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "pi", 
                     "command": ${JSON.stringify(["TS.GET", "distanz"])}}`
@@ -221,7 +221,7 @@ export class clientClass {
     //Ausführender Edge Node Name: nicht pi
     Btest2remote(connection) {
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "pi", 
                     "command": ${JSON.stringify(["TS.ADD", "distanz",`${Date.now()}` ,(iterator).toString()])}}`
@@ -242,7 +242,7 @@ export class clientClass {
     //Ausführender Edge Node Name: nicht pi
     Btest3remote(connection) {
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "pi", 
                     "command": ${JSON.stringify(["TS.ADD", "distanz",`${Date.now()}` ,(iterator).toString()])}}`
@@ -255,7 +255,7 @@ export class clientClass {
     Atest4remote(connection) {
         this.cycle(connection, this.send, (iterator) => {
             return `
-            {"type": "Command", 
+            {"type": "COMMAND", 
             "msgId": "${uuidv4()}", 
             "eccoBoxName": "pi", 
             "command": ${JSON.stringify(["TS.RANGE", "distanz", `${Date.now()-10000}`, `${Date.now()}`])}}`
@@ -266,7 +266,7 @@ export class clientClass {
     //Ausführender Edge Node Name: nicht pi
     Btest4remote(connection) {
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "pi", 
                     "command": ${JSON.stringify(["TS.ADD", "distanz",`${Date.now()}` ,(iterator).toString()])}}`
@@ -294,13 +294,13 @@ export class clientClass {
     //Ausführender Edge Node Name: node1
     Atest6remote(connection){
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node1", 
                     "command": ${JSON.stringify(["TS.ADD", "sensorname",`${Date.now()}` ,(iterator).toString()])}}`
         }, 20)
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node2", 
                     "command": ${JSON.stringify(["TS.GET", "sensorname"])}}`
@@ -311,13 +311,13 @@ export class clientClass {
     //Ausführender Edge Node Name: node2
     Btest6remote(connection){
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node2", 
                     "command": ${JSON.stringify(["TS.ADD", "sensorname",`${Date.now()}` ,(iterator).toString()])}}`
         }, 20)
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node3", 
                     "command": ${JSON.stringify(["TS.GET", "sensorname"])}}`
@@ -327,13 +327,13 @@ export class clientClass {
     //Ausführender Edge Node Name: node3
     Ctest6remote(connection){
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node3", 
                     "command": ${JSON.stringify(["TS.ADD", "sensorname",`${Date.now()}` ,(iterator).toString()])}}`
         }, 20)
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node4", 
                     "command": ${JSON.stringify(["TS.GET", "sensorname"])}}`
@@ -343,13 +343,13 @@ export class clientClass {
     //Ausführender Edge Node Name: node4
     Dtest6remote(connection){
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node4", 
                     "command": ${JSON.stringify(["TS.ADD", "sensorname",`${Date.now()}` ,(iterator).toString()])}}`
         }, 20)
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node5", 
                     "command": ${JSON.stringify(["TS.GET", "sensorname"])}}`
@@ -359,13 +359,13 @@ export class clientClass {
     //Ausführender Edge Node Name: node5
     Etest6remote(connection){
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node5", 
                     "command": ${JSON.stringify(["TS.ADD", "sensorname",`${Date.now()}` ,(iterator).toString()])}}`
         }, 20)
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node1", 
                     "command": ${JSON.stringify(["TS.GET", "sensorname"])}}`
@@ -386,7 +386,7 @@ export class clientClass {
             await sleep(100)
             console.log(`Now getting the last 2s of Data at Node ${currNodeNumber%5 + 1}`)
             this.send(`
-                {"type": "Command", 
+                {"type": "COMMAND", 
                 "msgId": "${uuidv4()}", 
                 "eccoBoxName": "node${currNodeNumber%5 + 1}", 
                 "command": ${JSON.stringify(["TS.RANGE", "sensorname", `${Date.now()-2000}`, `${Date.now()}`])}}`,
@@ -418,14 +418,14 @@ export class clientClass {
     //Ausführender Edge Node Name: node1
     Atest7remote(connection){
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node1", 
                     "command": ${JSON.stringify(["TS.ADD", "sensor1",`${Date.now()}` ,(iterator).toString()])}}`
         }, 100)
 
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node2", 
                     "command": ${JSON.stringify(["TS.ADD", "sensor1",`${Date.now()}` ,(iterator).toString()])}}`
@@ -435,7 +435,7 @@ export class clientClass {
     //Ausführender Edge Node Name: node2
     Btest7remote(connection){
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node2", 
                     "command": ${JSON.stringify(["TS.ADD", "sensor2",`${Date.now()}` ,(iterator).toString()])}}`
@@ -446,7 +446,7 @@ export class clientClass {
     //Ausführender Edge Node Name: node3
     Ctest7remote(connection){
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node2", 
                     "command": ${JSON.stringify(["TS.ADD", "sensor3",`${Date.now()}` ,(iterator).toString()])}}`
@@ -457,14 +457,14 @@ export class clientClass {
     //Ausführender Edge Node Name: node4
     Dtest7remote(connection){
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node2", 
                     "command": ${JSON.stringify(["TS.ADD", "sensor4",`${Date.now()}` ,(iterator).toString()])}}`
         }, 100)
 
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node1", 
                     "command": ${JSON.stringify(["TS.ADD", "sensor2",`${Date.now()}` ,(iterator).toString()])}}`
@@ -475,14 +475,14 @@ export class clientClass {
     //Ausführender Edge Node Name: node5
     Etest7remote(connection){
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node2", 
                     "command": ${JSON.stringify(["TS.ADD", "sensor5",`${Date.now()}` ,(iterator).toString()])}}`
         }, 100)
 
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Command", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node1", 
                     "command": ${JSON.stringify(["TS.ADD", "sensor3",`${Date.now()}` ,(iterator).toString()])}}`
@@ -504,7 +504,7 @@ export class clientClass {
                     await sleep(100)
                     console.log(`Now getting the last 2s of Data at Node ${nodeNumber}`)
                     this.send(`
-                        {"type": "Command", 
+                        {"type": "COMMAND", 
                         "msgId": "${uuidv4()}", 
                         "eccoBoxName": "node${nodeNumber}", 
                         "command": ${JSON.stringify(["TS.RANGE", `sensor${sensorNumber}`, `${Date.now()-2000}`, `${Date.now()}`])}}`,
