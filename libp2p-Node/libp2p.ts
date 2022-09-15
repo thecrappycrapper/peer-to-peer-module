@@ -372,7 +372,7 @@ export class p2pNode {
         })
     }
 
-    //An Peer im Netz ein Anfrage schicken
+    //An Peer im Netz eine Anfrage schicken
     async dial(msg: String, eccoBoxName: String ) {
 
         try {
