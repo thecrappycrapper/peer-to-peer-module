@@ -262,13 +262,20 @@ export class p2pNode {
     //Auf erhaltene Query antworten
     async response(adr: String, obj: String, n: any) {
         try {
-            const { stream, protocol } = await n.dialProtocol(multiaddr(adr), `/response/1.0.0`)
-            pipe(
-                Readable.from(obj),
-
-                (source) => (map(source, (string) => fromString(string))),
-
-                stream.sink
+            const { stream, protocol } = await 
+            n.dialProtocol(multiaddr(adr), `/response/1.0.0`).then(
+                function(stream, protocol){
+                    pipe(
+                        Readable.from(obj),
+        
+                        (source) => (map(source, (string) => fromString(string))),
+        
+                        stream.sink
+                    )
+                },
+                function(error){
+                    console.error(error)
+                }
             )
         }
         catch (e) {
@@ -385,14 +392,22 @@ export class p2pNode {
     async dial(msg: String, eccoBoxName: String ) {
 
         try {
-            const { stream, protocol } = await this.node.dialProtocol(this.lookupService.find(eccoBoxName)[0].maddr, `/query/1.0.0`)
-            pipe(
-                Readable.from(msg),
-
-                (source) => (map(source, (string) => fromString(string))),
-
-                stream.sink
+            //{ stream, protocol } = await 
+            this.node.dialProtocol(this.lookupService.find(eccoBoxName)[0].maddr, `/query/1.0.0`).then(
+                function(stream, protocol){
+                    pipe(
+                        Readable.from(msg),
+        
+                        (source) => (map(source, (string) => fromString(string))),
+        
+                        stream.sink
+                    )
+                },
+                function(error){
+                    console.error(error)
+                }
             )
+
         } catch (e) {
             console.error("dialError " + e)
         }

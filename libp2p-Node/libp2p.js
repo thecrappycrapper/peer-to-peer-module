@@ -422,10 +422,13 @@ var p2pNode = /** @class */ (function () {
                 switch (_b.label) {
                     case 0:
                         _b.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, n.dialProtocol(multiaddr(adr), "/response/1.0.0")];
+                        return [4 /*yield*/, n.dialProtocol(multiaddr(adr), "/response/1.0.0").then(function (stream, protocol) {
+                                pipe(stream_1.Readable.from(obj), function (source) { return (map(source, function (string) { return fromString(string); })); }, stream.sink);
+                            }, function (error) {
+                                console.error(error);
+                            })];
                     case 1:
                         _a = _b.sent(), stream = _a.stream, protocol = _a.protocol;
-                        pipe(stream_1.Readable.from(obj), function (source) { return (map(source, function (string) { return fromString(string); })); }, stream.sink);
                         return [3 /*break*/, 3];
                     case 2:
                         e_3 = _b.sent();
@@ -521,22 +524,19 @@ var p2pNode = /** @class */ (function () {
     //An Peer im Netz eine Anfrage schicken
     p2pNode.prototype.dial = function (msg, eccoBoxName) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, stream, protocol, e_4;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        _b.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.node.dialProtocol(this.lookupService.find(eccoBoxName)[0].maddr, "/query/1.0.0")];
-                    case 1:
-                        _a = _b.sent(), stream = _a.stream, protocol = _a.protocol;
+            return __generator(this, function (_a) {
+                try {
+                    //{ stream, protocol } = await 
+                    this.node.dialProtocol(this.lookupService.find(eccoBoxName)[0].maddr, "/query/1.0.0").then(function (stream, protocol) {
                         pipe(stream_1.Readable.from(msg), function (source) { return (map(source, function (string) { return fromString(string); })); }, stream.sink);
-                        return [3 /*break*/, 3];
-                    case 2:
-                        e_4 = _b.sent();
-                        console.error("dialError " + e_4);
-                        return [3 /*break*/, 3];
-                    case 3: return [2 /*return*/];
+                    }, function (error) {
+                        console.error(error);
+                    });
                 }
+                catch (e) {
+                    console.error("dialError " + e);
+                }
+                return [2 /*return*/];
             });
         });
     };
