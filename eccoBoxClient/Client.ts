@@ -116,7 +116,7 @@ export class clientClass {
     //Testfall auswählen
     async executeScript(connection){
         await sleep(5000)
-        this.Btest4remote(connection)
+        this.Btest5remote(connection)
     }
 
     //Lokale Tests---------------------------------------------
