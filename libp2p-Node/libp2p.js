@@ -417,25 +417,20 @@ var p2pNode = /** @class */ (function () {
     //Auf erhaltene Query antworten
     p2pNode.prototype.response = function (adr, obj, n) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, stream, protocol, e_3;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        _b.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, n.dialProtocol(multiaddr(adr), "/response/1.0.0").then(function (stream, protocol) {
-                                pipe(stream_1.Readable.from(obj), function (source) { return (map(source, function (string) { return fromString(string); })); }, stream.sink);
-                            }, function (error) {
-                                console.error(error);
-                            })];
-                    case 1:
-                        _a = _b.sent(), stream = _a.stream, protocol = _a.protocol;
-                        return [3 /*break*/, 3];
-                    case 2:
-                        e_3 = _b.sent();
-                        console.log(e_3);
-                        return [3 /*break*/, 3];
-                    case 3: return [2 /*return*/];
+            return __generator(this, function (_a) {
+                try {
+                    //const { stream, protocol } = await 
+                    n.dialProtocol(multiaddr(adr), "/response/1.0.0").then(function (_a) {
+                        var stream = _a.stream, protocol = _a.protocol;
+                        pipe(stream_1.Readable.from(obj), function (source) { return (map(source, function (string) { return fromString(string); })); }, stream.sink);
+                    }, function (error) {
+                        console.error(error);
+                    });
                 }
+                catch (e) {
+                    console.log(e);
+                }
+                return [2 /*return*/];
             });
         });
     };
@@ -527,7 +522,8 @@ var p2pNode = /** @class */ (function () {
             return __generator(this, function (_a) {
                 try {
                     //{ stream, protocol } = await 
-                    this.node.dialProtocol(this.lookupService.find(eccoBoxName)[0].maddr, "/query/1.0.0").then(function (stream, protocol) {
+                    this.node.dialProtocol(this.lookupService.find(eccoBoxName)[0].maddr, "/query/1.0.0").then(function (_a) {
+                        var stream = _a.stream, protocol = _a.protocol;
                         pipe(stream_1.Readable.from(msg), function (source) { return (map(source, function (string) { return fromString(string); })); }, stream.sink);
                     }, function (error) {
                         console.error(error);

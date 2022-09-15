@@ -262,9 +262,9 @@ export class p2pNode {
     //Auf erhaltene Query antworten
     async response(adr: String, obj: String, n: any) {
         try {
-            const { stream, protocol } = await 
+            //const { stream, protocol } = await 
             n.dialProtocol(multiaddr(adr), `/response/1.0.0`).then(
-                function(stream, protocol){
+                function({stream, protocol}){
                     pipe(
                         Readable.from(obj),
         
@@ -394,7 +394,8 @@ export class p2pNode {
         try {
             //{ stream, protocol } = await 
             this.node.dialProtocol(this.lookupService.find(eccoBoxName)[0].maddr, `/query/1.0.0`).then(
-                function(stream, protocol){
+                function({ stream, protocol }){
+
                     pipe(
                         Readable.from(msg),
         
