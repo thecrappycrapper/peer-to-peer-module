@@ -134,36 +134,40 @@ export class p2pNode {
         this.node.handle(`/query/1.0.0`, async ({ connection, stream, protocol }) => {
             let resp = this.response
             let n = this.node
-
-            pipe(
-                stream.source,
-
-                (source) => map(source, (buf) => toString(buf.slice())),
-                async function (source) {
-                    let allData = ""
-
-                    for await (let chunk of source) {
-                        allData += chunk.toString()
-                    }
-
-                    let commands = JSON.parse(allData.toString())
-
-                    root.get(commands.eccoBoxName, JSON.stringify(commands.query), commands.eccoBoxClientId, commands.msgId).then(function (value) {
- 
-                        resp(commands.addr, `{"type": "COMMAND", 
-                                            "msgId" : "${commands.msgId}",
-                                            "eccoBoxName": "${root.myEccoBoxName}", 
-                                            "data": ${JSON.stringify(value)}, 
-                                            "eccoBoxClientId" : "${commands.eccoBoxClientId}"}`, 
-                                            n)
-                    }, function (err) {
-                        resp(commands.addr, `{"type": "ERROR",
-                                            "msgId" : "${commands.msgId}", 
-                                            "eccoBoxClientId": "${commands.eccoBoxClientId}"}`, 
-                                            n)
-                    })
-                    }
-            )
+            try{
+                pipe(
+                    stream.source,
+    
+                    (source) => map(source, (buf) => toString(buf.slice())),
+                    async function (source) {
+                        let allData = ""
+    
+                        for await (let chunk of source) {
+                            allData += chunk.toString()
+                        }
+    
+                        let commands = JSON.parse(allData.toString())
+    
+                        root.get(commands.eccoBoxName, JSON.stringify(commands.query), commands.eccoBoxClientId, commands.msgId).then(function (value) {
+     
+                            resp(commands.addr, `{"type": "COMMAND", 
+                                                "msgId" : "${commands.msgId}",
+                                                "eccoBoxName": "${root.myEccoBoxName}", 
+                                                "data": ${JSON.stringify(value)}, 
+                                                "eccoBoxClientId" : "${commands.eccoBoxClientId}"}`, 
+                                                n)
+                        }, function (err) {
+                            resp(commands.addr, `{"type": "ERROR",
+                                                "msgId" : "${commands.msgId}", 
+                                                "eccoBoxClientId": "${commands.eccoBoxClientId}"}`, 
+                                                n)
+                        })
+                        }
+                )
+            }
+            catch(e){
+                console.error(e)
+            }
         })
 
         this.node.multiaddrs.forEach(addr => {
@@ -181,18 +185,23 @@ export class p2pNode {
         //Antwort aus dem Netz an udsServer weiterleiten
         await this.listener
         this.node.handle(`/response/1.0.0`, async ({ connection, stream, protocol }) => {
-            pipe(
-                stream.source,
-
-                (source) => map(source, (buf) => toString(buf.slice())),
-                async function (source) {
-                    let allData = ""
-                    for await (let chunk of source) {
-                        allData += chunk.toString()
+            try{
+                pipe(
+                    stream.source,
+    
+                    (source) => map(source, (buf) => toString(buf.slice())),
+                    async function (source) {
+                        let allData = ""
+                        for await (let chunk of source) {
+                            allData += chunk.toString()
+                        }
+                        root.listener.respond(allData.toString())
                     }
-                    root.listener.respond(allData.toString())
-                }
-            )
+                )
+            }
+            catch(e){
+                console.error(e)
+            }
         })
     }
 

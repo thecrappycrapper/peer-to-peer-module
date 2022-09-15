@@ -290,7 +290,7 @@ export class clientClass {
     //Tests in größeren Netzen----------------------------------
     //Test6: Speichern und abrufen von allen, einer abonniert abwechselnd
 
-    //Lokal Datensätze hinzufügen, bei der nächsten Node Datensätze alle 50ms abrufen
+    //Lokal Datensätze hinzufügen, bei der nächsten Node Datensätze alle 100ms abrufen
     //Ausführender Edge Node Name: node1
     Atest6remote(connection){
         this.cycle(connection, this.send, (iterator) => {
@@ -298,16 +298,16 @@ export class clientClass {
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node1", 
                     "command": ${JSON.stringify(["TS.ADD", "sensorname",`${Date.now()}` ,(iterator).toString()])}}`
-        }, 50)
+        }, 100)
         this.cycle(connection, this.send, (iterator) => {
             return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node2", 
                     "command": ${JSON.stringify(["TS.GET", "sensorname"])}}`
-        }, 50)
+        }, 100)
         
     }
-    //Lokal Datensätze hinzufügen, bei der nächsten Node Datensätze alle 50ms abrufen
+    //Lokal Datensätze hinzufügen, bei der nächsten Node Datensätze alle 100ms abrufen
     //Ausführender Edge Node Name: node2
     Btest6remote(connection){
         this.cycle(connection, this.send, (iterator) => {
@@ -315,15 +315,15 @@ export class clientClass {
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node2", 
                     "command": ${JSON.stringify(["TS.ADD", "sensorname",`${Date.now()}` ,(iterator).toString()])}}`
-        }, 50)
+        }, 100)
         this.cycle(connection, this.send, (iterator) => {
             return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node3", 
                     "command": ${JSON.stringify(["TS.GET", "sensorname"])}}`
-        }, 50)
+        }, 100)
     }
-    //Lokal Datensätze hinzufügen, bei der nächsten Node Datensätze alle 50ms abrufen
+    //Lokal Datensätze hinzufügen, bei der nächsten Node Datensätze alle 100ms abrufen
     //Ausführender Edge Node Name: node3
     Ctest6remote(connection){
         this.cycle(connection, this.send, (iterator) => {
@@ -331,15 +331,15 @@ export class clientClass {
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node3", 
                     "command": ${JSON.stringify(["TS.ADD", "sensorname",`${Date.now()}` ,(iterator).toString()])}}`
-        }, 50)
+        }, 100)
         this.cycle(connection, this.send, (iterator) => {
             return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node4", 
                     "command": ${JSON.stringify(["TS.GET", "sensorname"])}}`
-        }, 50)
+        }, 100)
     }
-    //Lokal Datensätze hinzufügen, bei der nächsten Node Datensätze alle 50ms abrufen
+    //Lokal Datensätze hinzufügen, bei der nächsten Node Datensätze alle 100ms abrufen
     //Ausführender Edge Node Name: node4
     Dtest6remote(connection){
         this.cycle(connection, this.send, (iterator) => {
@@ -347,15 +347,15 @@ export class clientClass {
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node4", 
                     "command": ${JSON.stringify(["TS.ADD", "sensorname",`${Date.now()}` ,(iterator).toString()])}}`
-        }, 50)
+        }, 100)
         this.cycle(connection, this.send, (iterator) => {
             return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node5", 
                     "command": ${JSON.stringify(["TS.GET", "sensorname"])}}`
-        }, 50)
+        }, 100)
     }
-    //Lokal Datensätze hinzufügen, bei der nächsten Node Datensätze alle 50ms abrufen
+    //Lokal Datensätze hinzufügen, bei der nächsten Node Datensätze alle 100ms abrufen
     //Ausführender Edge Node Name: node5
     Etest6remote(connection){
         this.cycle(connection, this.send, (iterator) => {
@@ -363,13 +363,13 @@ export class clientClass {
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node5", 
                     "command": ${JSON.stringify(["TS.ADD", "sensorname",`${Date.now()}` ,(iterator).toString()])}}`
-        }, 50)
+        }, 100)
         this.cycle(connection, this.send, (iterator) => {
             return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "node1", 
                     "command": ${JSON.stringify(["TS.GET", "sensorname"])}}`
-        }, 50)
+        }, 100)
     }
     //Fragt zuerst den Status an, danach geht es die anderen Nodes durch und fragt jeweils Datensätze ab, 
     //subscribet sich kurzzeitig und unsubscribet sich danach
@@ -394,7 +394,7 @@ export class clientClass {
             
             await sleep(1000)
 
-            console.log(`Now Subscribing to Node ${currNodeNumber%5}`)
+            console.log(`Now Subscribing to Node ${currNodeNumber%5 + 1}`)
             this.send((`
                 {"type": "SUB",
                 "eccoBoxName":"node${currNodeNumber%5 + 1}", 
@@ -408,7 +408,7 @@ export class clientClass {
                 "sensor": "sensorname"}`), 
             connection)
 
-            currNodeNumber = (currNodeNumber + 1)%5
+            currNodeNumber = (currNodeNumber + 1)
         }
     }
 

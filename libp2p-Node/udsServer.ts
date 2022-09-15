@@ -49,7 +49,7 @@ class EccoBoxClient {
     addSubscriptions(eccoBoxName: String, sensor: String): String {
         if (!this.isSubscribed(eccoBoxName, sensor)) {
             if(this.subscriptions.some(element => {return element.eccoBoxName == eccoBoxName}))
-                this.subscriptions.some(element => {return element.eccoBoxName == eccoBoxName})[0].addSensor(sensor)
+                this.subscriptions.find(element => {return element.eccoBoxName == eccoBoxName}).addSensor(sensor)
             else{
                 const newSubscription = new Subscription(eccoBoxName)
                 newSubscription.addSensor(sensor)
@@ -119,6 +119,7 @@ export class udsServer implements SubListener{
 
             let chunks = []
             socket.on('data', (chunk) => {
+                console.log(`Length of query: ${chunk.toString().length}`)
 
                 let chunkArr = chunk.toString().split('End\n')
                 if (chunk.toString == 'End\n') {

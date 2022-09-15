@@ -179,56 +179,61 @@ var p2pNode = /** @class */ (function () {
                                 return __generator(this, function (_b) {
                                     resp = this.response;
                                     n = this.node;
-                                    pipe(stream.source, function (source) { return map(source, function (buf) { return toString(buf.slice()); }); }, function (source) {
-                                        var source_1, source_1_1;
-                                        var e_1, _a;
-                                        return __awaiter(this, void 0, void 0, function () {
-                                            var allData, chunk, e_1_1, commands;
-                                            return __generator(this, function (_b) {
-                                                switch (_b.label) {
-                                                    case 0:
-                                                        allData = "";
-                                                        _b.label = 1;
-                                                    case 1:
-                                                        _b.trys.push([1, 6, 7, 12]);
-                                                        source_1 = __asyncValues(source);
-                                                        _b.label = 2;
-                                                    case 2: return [4 /*yield*/, source_1.next()];
-                                                    case 3:
-                                                        if (!(source_1_1 = _b.sent(), !source_1_1.done)) return [3 /*break*/, 5];
-                                                        chunk = source_1_1.value;
-                                                        allData += chunk.toString();
-                                                        _b.label = 4;
-                                                    case 4: return [3 /*break*/, 2];
-                                                    case 5: return [3 /*break*/, 12];
-                                                    case 6:
-                                                        e_1_1 = _b.sent();
-                                                        e_1 = { error: e_1_1 };
-                                                        return [3 /*break*/, 12];
-                                                    case 7:
-                                                        _b.trys.push([7, , 10, 11]);
-                                                        if (!(source_1_1 && !source_1_1.done && (_a = source_1["return"]))) return [3 /*break*/, 9];
-                                                        return [4 /*yield*/, _a.call(source_1)];
-                                                    case 8:
-                                                        _b.sent();
-                                                        _b.label = 9;
-                                                    case 9: return [3 /*break*/, 11];
-                                                    case 10:
-                                                        if (e_1) throw e_1.error;
-                                                        return [7 /*endfinally*/];
-                                                    case 11: return [7 /*endfinally*/];
-                                                    case 12:
-                                                        commands = JSON.parse(allData.toString());
-                                                        root.get(commands.eccoBoxName, JSON.stringify(commands.query), commands.eccoBoxClientId, commands.msgId).then(function (value) {
-                                                            resp(commands.addr, "{\"type\": \"COMMAND\", \n                                            \"msgId\" : \"".concat(commands.msgId, "\",\n                                            \"eccoBoxName\": \"").concat(root.myEccoBoxName, "\", \n                                            \"data\": ").concat(JSON.stringify(value), ", \n                                            \"eccoBoxClientId\" : \"").concat(commands.eccoBoxClientId, "\"}"), n);
-                                                        }, function (err) {
-                                                            resp(commands.addr, "{\"type\": \"ERROR\",\n                                            \"msgId\" : \"".concat(commands.msgId, "\", \n                                            \"eccoBoxClientId\": \"").concat(commands.eccoBoxClientId, "\"}"), n);
-                                                        });
-                                                        return [2 /*return*/];
-                                                }
+                                    try {
+                                        pipe(stream.source, function (source) { return map(source, function (buf) { return toString(buf.slice()); }); }, function (source) {
+                                            var source_1, source_1_1;
+                                            var e_1, _a;
+                                            return __awaiter(this, void 0, void 0, function () {
+                                                var allData, chunk, e_1_1, commands;
+                                                return __generator(this, function (_b) {
+                                                    switch (_b.label) {
+                                                        case 0:
+                                                            allData = "";
+                                                            _b.label = 1;
+                                                        case 1:
+                                                            _b.trys.push([1, 6, 7, 12]);
+                                                            source_1 = __asyncValues(source);
+                                                            _b.label = 2;
+                                                        case 2: return [4 /*yield*/, source_1.next()];
+                                                        case 3:
+                                                            if (!(source_1_1 = _b.sent(), !source_1_1.done)) return [3 /*break*/, 5];
+                                                            chunk = source_1_1.value;
+                                                            allData += chunk.toString();
+                                                            _b.label = 4;
+                                                        case 4: return [3 /*break*/, 2];
+                                                        case 5: return [3 /*break*/, 12];
+                                                        case 6:
+                                                            e_1_1 = _b.sent();
+                                                            e_1 = { error: e_1_1 };
+                                                            return [3 /*break*/, 12];
+                                                        case 7:
+                                                            _b.trys.push([7, , 10, 11]);
+                                                            if (!(source_1_1 && !source_1_1.done && (_a = source_1["return"]))) return [3 /*break*/, 9];
+                                                            return [4 /*yield*/, _a.call(source_1)];
+                                                        case 8:
+                                                            _b.sent();
+                                                            _b.label = 9;
+                                                        case 9: return [3 /*break*/, 11];
+                                                        case 10:
+                                                            if (e_1) throw e_1.error;
+                                                            return [7 /*endfinally*/];
+                                                        case 11: return [7 /*endfinally*/];
+                                                        case 12:
+                                                            commands = JSON.parse(allData.toString());
+                                                            root.get(commands.eccoBoxName, JSON.stringify(commands.query), commands.eccoBoxClientId, commands.msgId).then(function (value) {
+                                                                resp(commands.addr, "{\"type\": \"COMMAND\", \n                                                \"msgId\" : \"".concat(commands.msgId, "\",\n                                                \"eccoBoxName\": \"").concat(root.myEccoBoxName, "\", \n                                                \"data\": ").concat(JSON.stringify(value), ", \n                                                \"eccoBoxClientId\" : \"").concat(commands.eccoBoxClientId, "\"}"), n);
+                                                            }, function (err) {
+                                                                resp(commands.addr, "{\"type\": \"ERROR\",\n                                                \"msgId\" : \"".concat(commands.msgId, "\", \n                                                \"eccoBoxClientId\": \"").concat(commands.eccoBoxClientId, "\"}"), n);
+                                                            });
+                                                            return [2 /*return*/];
+                                                    }
+                                                });
                                             });
                                         });
-                                    });
+                                    }
+                                    catch (e) {
+                                        console.error(e);
+                                    }
                                     return [2 /*return*/];
                                 });
                             });
@@ -251,51 +256,56 @@ var p2pNode = /** @class */ (function () {
                             var connection = _a.connection, stream = _a.stream, protocol = _a.protocol;
                             return __awaiter(_this, void 0, void 0, function () {
                                 return __generator(this, function (_b) {
-                                    pipe(stream.source, function (source) { return map(source, function (buf) { return toString(buf.slice()); }); }, function (source) {
-                                        var source_2, source_2_1;
-                                        var e_2, _a;
-                                        return __awaiter(this, void 0, void 0, function () {
-                                            var allData, chunk, e_2_1;
-                                            return __generator(this, function (_b) {
-                                                switch (_b.label) {
-                                                    case 0:
-                                                        allData = "";
-                                                        _b.label = 1;
-                                                    case 1:
-                                                        _b.trys.push([1, 6, 7, 12]);
-                                                        source_2 = __asyncValues(source);
-                                                        _b.label = 2;
-                                                    case 2: return [4 /*yield*/, source_2.next()];
-                                                    case 3:
-                                                        if (!(source_2_1 = _b.sent(), !source_2_1.done)) return [3 /*break*/, 5];
-                                                        chunk = source_2_1.value;
-                                                        allData += chunk.toString();
-                                                        _b.label = 4;
-                                                    case 4: return [3 /*break*/, 2];
-                                                    case 5: return [3 /*break*/, 12];
-                                                    case 6:
-                                                        e_2_1 = _b.sent();
-                                                        e_2 = { error: e_2_1 };
-                                                        return [3 /*break*/, 12];
-                                                    case 7:
-                                                        _b.trys.push([7, , 10, 11]);
-                                                        if (!(source_2_1 && !source_2_1.done && (_a = source_2["return"]))) return [3 /*break*/, 9];
-                                                        return [4 /*yield*/, _a.call(source_2)];
-                                                    case 8:
-                                                        _b.sent();
-                                                        _b.label = 9;
-                                                    case 9: return [3 /*break*/, 11];
-                                                    case 10:
-                                                        if (e_2) throw e_2.error;
-                                                        return [7 /*endfinally*/];
-                                                    case 11: return [7 /*endfinally*/];
-                                                    case 12:
-                                                        root.listener.respond(allData.toString());
-                                                        return [2 /*return*/];
-                                                }
+                                    try {
+                                        pipe(stream.source, function (source) { return map(source, function (buf) { return toString(buf.slice()); }); }, function (source) {
+                                            var source_2, source_2_1;
+                                            var e_2, _a;
+                                            return __awaiter(this, void 0, void 0, function () {
+                                                var allData, chunk, e_2_1;
+                                                return __generator(this, function (_b) {
+                                                    switch (_b.label) {
+                                                        case 0:
+                                                            allData = "";
+                                                            _b.label = 1;
+                                                        case 1:
+                                                            _b.trys.push([1, 6, 7, 12]);
+                                                            source_2 = __asyncValues(source);
+                                                            _b.label = 2;
+                                                        case 2: return [4 /*yield*/, source_2.next()];
+                                                        case 3:
+                                                            if (!(source_2_1 = _b.sent(), !source_2_1.done)) return [3 /*break*/, 5];
+                                                            chunk = source_2_1.value;
+                                                            allData += chunk.toString();
+                                                            _b.label = 4;
+                                                        case 4: return [3 /*break*/, 2];
+                                                        case 5: return [3 /*break*/, 12];
+                                                        case 6:
+                                                            e_2_1 = _b.sent();
+                                                            e_2 = { error: e_2_1 };
+                                                            return [3 /*break*/, 12];
+                                                        case 7:
+                                                            _b.trys.push([7, , 10, 11]);
+                                                            if (!(source_2_1 && !source_2_1.done && (_a = source_2["return"]))) return [3 /*break*/, 9];
+                                                            return [4 /*yield*/, _a.call(source_2)];
+                                                        case 8:
+                                                            _b.sent();
+                                                            _b.label = 9;
+                                                        case 9: return [3 /*break*/, 11];
+                                                        case 10:
+                                                            if (e_2) throw e_2.error;
+                                                            return [7 /*endfinally*/];
+                                                        case 11: return [7 /*endfinally*/];
+                                                        case 12:
+                                                            root.listener.respond(allData.toString());
+                                                            return [2 /*return*/];
+                                                    }
+                                                });
                                             });
                                         });
-                                    });
+                                    }
+                                    catch (e) {
+                                        console.error(e);
+                                    }
                                     return [2 /*return*/];
                                 });
                             });
@@ -508,7 +518,7 @@ var p2pNode = /** @class */ (function () {
             console.error(err);
         });
     };
-    //An Peer im Netz ein Anfrage schicken
+    //An Peer im Netz eine Anfrage schicken
     p2pNode.prototype.dial = function (msg, eccoBoxName) {
         return __awaiter(this, void 0, void 0, function () {
             var _a, stream, protocol, e_4;

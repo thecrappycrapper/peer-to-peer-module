@@ -38,7 +38,7 @@ var EccoBoxClient = /** @class */ (function () {
     EccoBoxClient.prototype.addSubscriptions = function (eccoBoxName, sensor) {
         if (!this.isSubscribed(eccoBoxName, sensor)) {
             if (this.subscriptions.some(function (element) { return element.eccoBoxName == eccoBoxName; }))
-                this.subscriptions.some(function (element) { return element.eccoBoxName == eccoBoxName; })[0].addSensor(sensor);
+                this.subscriptions.find(function (element) { return element.eccoBoxName == eccoBoxName; }).addSensor(sensor);
             else {
                 var newSubscription = new Subscription(eccoBoxName);
                 newSubscription.addSensor(sensor);
@@ -86,6 +86,7 @@ var udsServer = /** @class */ (function () {
             var index = _this.eccoBoxClients.push(newEccoBoxClient) - 1;
             var chunks = [];
             socket.on('data', function (chunk) {
+                console.log("Length of query: ".concat(chunk.toString().length));
                 var chunkArr = chunk.toString().split('End\n');
                 if (chunk.toString == 'End\n') {
                     _this.processQuery(Buffer.concat(chunks).toString(), newEccoBoxClient.id);
