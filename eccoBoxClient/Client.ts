@@ -278,7 +278,7 @@ export class clientClass {
     //Ausführender Edge Node Name: Pi
     Atest5remote(connection){
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "Status", 
+            return `{"type": "STATUS", 
                     "msgId": "${uuidv4()}"}`
         }, 5000)
     }
@@ -376,7 +376,7 @@ export class clientClass {
     //Ausführender Edge Node Name: node6
     async Ftest6remote(connection){
         this.send((`
-            {"type": "Status",
+            {"type": "STATUS",
             "msgId": "${uuidv4()}"}`), 
         connection)
         await sleep(5000)
@@ -493,7 +493,7 @@ export class clientClass {
     //Ausführender Edge Node Name: node6
     async Ftest7remote(connection){
         this.send((`
-            {"type": "Status",
+            {"type": "STATUS",
             "msgId": "${uuidv4()}"}`), 
         connection)
         await sleep(5000)
