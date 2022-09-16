@@ -77,6 +77,7 @@ export class clientClass {
             }
             else{
                 error(err)
+                this.checkForServer(true)
             }
         })
         client.on('close', hadError => {

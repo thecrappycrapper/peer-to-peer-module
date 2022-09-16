@@ -240,10 +240,15 @@ export class udsServer implements SubListener{
     
     //Behandeln von Antwort von Libp2p Instanz im Fall einer Anfrage
     respond(msg: String){
-        let obj = JSON.parse(msg.toString());
-        const client = this.getEccoBoxClientFromId(obj.eccoBoxClientId)
-        delete obj.eccoBoxClientId
-        this.send(JSON.stringify(obj), client)
+        try{
+            let obj = JSON.parse(msg.toString());
+            const client = this.getEccoBoxClientFromId(obj.eccoBoxClientId)
+            delete obj.eccoBoxClientId
+            this.send(JSON.stringify(obj), client)
+        }
+        catch (e){
+            console.error("Error during reply to Client:")
+        }
     }
 
     getEccoBoxClientFromId(Id: String): EccoBoxClient {

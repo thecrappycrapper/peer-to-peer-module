@@ -256,6 +256,9 @@ var p2pNode = /** @class */ (function () {
                             var connection = _a.connection, stream = _a.stream, protocol = _a.protocol;
                             return __awaiter(_this, void 0, void 0, function () {
                                 return __generator(this, function (_b) {
+                                    connection.on("error", function (err) {
+                                        console.log(err);
+                                    });
                                     try {
                                         pipe(stream.source, function (source) { return map(source, function (buf) { return toString(buf.slice()); }); }, function (source) {
                                             var source_2, source_2_1;

@@ -185,6 +185,9 @@ export class p2pNode {
         //Antwort aus dem Netz an udsServer weiterleiten
         await this.listener
         this.node.handle(`/response/1.0.0`, async ({ connection, stream, protocol }) => {
+            connection.on("error", function(err){
+                console.log(err)
+            })
             try{
                 pipe(
                     stream.source,
@@ -398,6 +401,7 @@ export class p2pNode {
             this.node.dialProtocol(this.lookupService.find(eccoBoxName)[0].maddr, `/query/1.0.0`).then(
                 function({ stream, protocol }){
                     console.log(stream)
+
                     console.log(protocol)
                     /*stream.on('error', function(err){
                         console.error(err)

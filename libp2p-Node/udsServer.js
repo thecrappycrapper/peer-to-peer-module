@@ -194,10 +194,15 @@ var udsServer = /** @class */ (function () {
     };
     //Behandeln von Antwort von Libp2p Instanz im Fall einer Anfrage
     udsServer.prototype.respond = function (msg) {
-        var obj = JSON.parse(msg.toString());
-        var client = this.getEccoBoxClientFromId(obj.eccoBoxClientId);
-        delete obj.eccoBoxClientId;
-        this.send(JSON.stringify(obj), client);
+        try {
+            var obj = JSON.parse(msg.toString());
+            var client = this.getEccoBoxClientFromId(obj.eccoBoxClientId);
+            delete obj.eccoBoxClientId;
+            this.send(JSON.stringify(obj), client);
+        }
+        catch (e) {
+            console.error("Error during reply to Client:");
+        }
     };
     udsServer.prototype.getEccoBoxClientFromId = function (Id) {
         var foundPeer = null;
