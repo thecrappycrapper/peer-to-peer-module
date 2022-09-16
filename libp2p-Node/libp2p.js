@@ -183,10 +183,10 @@ var p2pNode = /** @class */ (function () {
                         this.node.handle("/query/1.0.0", function (_a) {
                             var connection = _a.connection, stream = _a.stream, protocol = _a.protocol;
                             return __awaiter(_this, void 0, void 0, function () {
-                                var resp, n;
+                                var resp, root;
                                 return __generator(this, function (_b) {
                                     resp = this.response;
-                                    n = this.node;
+                                    root = this;
                                     try {
                                         pipe(stream.source, function (source) { return map(source, function (buf) { return toString(buf.slice()); }); }, function (source) {
                                             var source_1, source_1_1;
@@ -229,9 +229,9 @@ var p2pNode = /** @class */ (function () {
                                                         case 12:
                                                             commands = JSON.parse(allData.toString());
                                                             root.get(commands.eccoBoxName, JSON.stringify(commands.query), commands.eccoBoxClientId, commands.msgId).then(function (value) {
-                                                                resp(commands.addr, "{\"type\": \"COMMAND\", \n                                                \"msgId\" : \"".concat(commands.msgId, "\",\n                                                \"eccoBoxName\": \"").concat(root.myEccoBoxName, "\", \n                                                \"data\": ").concat(JSON.stringify(value), ", \n                                                \"eccoBoxClientId\" : \"").concat(commands.eccoBoxClientId, "\"}"), n);
+                                                                resp(commands.addr, "{\"type\": \"COMMAND\", \n                                                \"msgId\" : \"".concat(commands.msgId, "\",\n                                                \"eccoBoxName\": \"").concat(root.myEccoBoxName, "\", \n                                                \"data\": ").concat(JSON.stringify(value), ", \n                                                \"eccoBoxClientId\" : \"").concat(commands.eccoBoxClientId, "\"}"), root);
                                                             }, function (err) {
-                                                                resp(commands.addr, "{\"type\": \"ERROR\",\n                                                \"msgId\" : \"".concat(commands.msgId, "\", \n                                                \"eccoBoxClientId\": \"").concat(commands.eccoBoxClientId, "\"}"), n);
+                                                                resp(commands.addr, "{\"type\": \"ERROR\",\n                                                \"msgId\" : \"".concat(commands.msgId, "\", \n                                                \"eccoBoxClientId\": \"").concat(commands.eccoBoxClientId, "\"}"), root);
                                                             });
                                                             return [2 /*return*/];
                                                     }
@@ -423,14 +423,14 @@ var p2pNode = /** @class */ (function () {
         });
     };
     //Auf erhaltene Query antworten
-    p2pNode.prototype.response = function (adr, obj, n) {
+    p2pNode.prototype.response = function (adr, obj, root) {
         return __awaiter(this, void 0, void 0, function () {
             var lookupReference_1, lookForPeerRef_1;
             return __generator(this, function (_a) {
                 try {
-                    lookupReference_1 = this.lookupService;
-                    lookForPeerRef_1 = this.lookForLostPeer(this.node);
-                    n.dialProtocol(multiaddr(adr), "/response/1.0.0").then(function (_a) {
+                    lookupReference_1 = root.lookupService;
+                    lookForPeerRef_1 = root.lookForLostPeer(root.node);
+                    root.node.dialProtocol(multiaddr(adr), "/response/1.0.0").then(function (_a) {
                         var stream = _a.stream, protocol = _a.protocol;
                         pipe(stream_1.Readable.from(obj), function (source) { return (map(source, function (string) { return fromString(string); })); }, stream.sink);
                     }, function (error) {
@@ -441,7 +441,7 @@ var p2pNode = /** @class */ (function () {
                     });
                 }
                 catch (e) {
-                    console.log(e);
+                    console.error(e);
                 }
                 return [2 /*return*/];
             });

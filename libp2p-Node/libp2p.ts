@@ -142,7 +142,7 @@ export class p2pNode {
         //Empfangen einer Query aus dem Netz
         this.node.handle(`/query/1.0.0`, async ({ connection, stream, protocol }) => {
             let resp = this.response
-            let n = this.node
+            let root = this
             try{
                 pipe(
                     stream.source,
@@ -164,12 +164,12 @@ export class p2pNode {
                                                 "eccoBoxName": "${root.myEccoBoxName}", 
                                                 "data": ${JSON.stringify(value)}, 
                                                 "eccoBoxClientId" : "${commands.eccoBoxClientId}"}`, 
-                                                n)
+                                                root)
                         }, function (err) {
                             resp(commands.addr, `{"type": "ERROR",
                                                 "msgId" : "${commands.msgId}", 
                                                 "eccoBoxClientId": "${commands.eccoBoxClientId}"}`, 
-                                                n)
+                                                root)
                         })
                         }
                 )
@@ -270,11 +270,11 @@ export class p2pNode {
     }
 
     //Auf erhaltene Query antworten
-    async response(adr: String, obj: String, n: any) {
+    async response(adr: String, obj: String, root: any) {
         try {
-            let lookupReference = this.lookupService
-            let lookForPeerRef = this.lookForLostPeer(this.node)
-            n.dialProtocol(multiaddr(adr), `/response/1.0.0`).then(
+            let lookupReference = root.lookupService
+            let lookForPeerRef = root.lookForLostPeer(root.node)
+            root.node.dialProtocol(multiaddr(adr), `/response/1.0.0`).then(
                 function({stream, protocol}){
                     pipe(
                         Readable.from(obj),
@@ -293,7 +293,7 @@ export class p2pNode {
             )
         }
         catch (e) {
-            console.log(e);
+            console.error(e);
         }
     }
 
