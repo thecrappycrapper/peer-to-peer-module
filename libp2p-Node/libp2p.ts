@@ -265,9 +265,8 @@ export class p2pNode {
             //const { stream, protocol } = await 
             n.dialProtocol(multiaddr(adr), `/response/1.0.0`).then(
                 function({stream, protocol}){
-                    stream.on('error', function(err){
-                        console.error(err)
-                    })
+                    console.log(stream)
+                    console.log(protocol)
                     pipe(
                         Readable.from(obj),
         
@@ -398,9 +397,11 @@ export class p2pNode {
             //{ stream, protocol } = await 
             this.node.dialProtocol(this.lookupService.find(eccoBoxName)[0].maddr, `/query/1.0.0`).then(
                 function({ stream, protocol }){
-                    stream.on('error', function(err){
+                    console.log(stream)
+                    console.log(protocol)
+                    /*stream.on('error', function(err){
                         console.error(err)
-                    })
+                    })*/
                     pipe(
                         Readable.from(msg),
         
