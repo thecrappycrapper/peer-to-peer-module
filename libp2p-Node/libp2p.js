@@ -422,6 +422,9 @@ var p2pNode = /** @class */ (function () {
                     //const { stream, protocol } = await 
                     n.dialProtocol(multiaddr(adr), "/response/1.0.0").then(function (_a) {
                         var stream = _a.stream, protocol = _a.protocol;
+                        stream.on('error', function (err) {
+                            console.error(err);
+                        });
                         pipe(stream_1.Readable.from(obj), function (source) { return (map(source, function (string) { return fromString(string); })); }, stream.sink);
                     }, function (error) {
                         console.error(error);
@@ -524,6 +527,9 @@ var p2pNode = /** @class */ (function () {
                     //{ stream, protocol } = await 
                     this.node.dialProtocol(this.lookupService.find(eccoBoxName)[0].maddr, "/query/1.0.0").then(function (_a) {
                         var stream = _a.stream, protocol = _a.protocol;
+                        stream.on('error', function (err) {
+                            console.error(err);
+                        });
                         pipe(stream_1.Readable.from(msg), function (source) { return (map(source, function (string) { return fromString(string); })); }, stream.sink);
                     }, function (error) {
                         console.error(error);
