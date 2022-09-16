@@ -164,12 +164,12 @@ export class p2pNode {
                                                 "eccoBoxName": "${root.myEccoBoxName}", 
                                                 "data": ${JSON.stringify(value)}, 
                                                 "eccoBoxClientId" : "${commands.eccoBoxClientId}"}`, 
-                                                root)
+                                                root).catch(err=>console.error(err))
                         }, function (err) {
                             resp(commands.addr, `{"type": "ERROR",
                                                 "msgId" : "${commands.msgId}", 
                                                 "eccoBoxClientId": "${commands.eccoBoxClientId}"}`, 
-                                                root)
+                                                root).catch(err=>console.error(err))
                         })
                         }
                 )
@@ -354,7 +354,7 @@ export class p2pNode {
                                     "eccoBoxName": "${eccoBoxName}", 
                                     "addr": "${this.myAddr}", 
                                     "query": ${query} }`, 
-                                    eccoBoxName)
+                                    eccoBoxName).catch((err)=>console.error(err))
                     }
                 }
                 return `PLEASE WAIT`

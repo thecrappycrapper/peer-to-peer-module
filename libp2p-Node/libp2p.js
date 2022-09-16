@@ -229,9 +229,9 @@ var p2pNode = /** @class */ (function () {
                                                         case 12:
                                                             commands = JSON.parse(allData.toString());
                                                             root.get(commands.eccoBoxName, JSON.stringify(commands.query), commands.eccoBoxClientId, commands.msgId).then(function (value) {
-                                                                resp(commands.addr, "{\"type\": \"COMMAND\", \n                                                \"msgId\" : \"".concat(commands.msgId, "\",\n                                                \"eccoBoxName\": \"").concat(root.myEccoBoxName, "\", \n                                                \"data\": ").concat(JSON.stringify(value), ", \n                                                \"eccoBoxClientId\" : \"").concat(commands.eccoBoxClientId, "\"}"), root);
+                                                                resp(commands.addr, "{\"type\": \"COMMAND\", \n                                                \"msgId\" : \"".concat(commands.msgId, "\",\n                                                \"eccoBoxName\": \"").concat(root.myEccoBoxName, "\", \n                                                \"data\": ").concat(JSON.stringify(value), ", \n                                                \"eccoBoxClientId\" : \"").concat(commands.eccoBoxClientId, "\"}"), root)["catch"](function (err) { return console.error(err); });
                                                             }, function (err) {
-                                                                resp(commands.addr, "{\"type\": \"ERROR\",\n                                                \"msgId\" : \"".concat(commands.msgId, "\", \n                                                \"eccoBoxClientId\": \"").concat(commands.eccoBoxClientId, "\"}"), root);
+                                                                resp(commands.addr, "{\"type\": \"ERROR\",\n                                                \"msgId\" : \"".concat(commands.msgId, "\", \n                                                \"eccoBoxClientId\": \"").concat(commands.eccoBoxClientId, "\"}"), root)["catch"](function (err) { return console.error(err); });
                                                             });
                                                             return [2 /*return*/];
                                                     }
@@ -491,7 +491,7 @@ var p2pNode = /** @class */ (function () {
                     case 5:
                         if (this.listener != null) {
                             if (this.lookupService.find(eccoBoxName).length > 0) {
-                                this.dial("{\"eccoBoxClientId\": \"".concat(eccoBoxClientId, "\", \n                                    \"msgId\" : \"").concat(messageId, "\",\n                                    \"eccoBoxName\": \"").concat(eccoBoxName, "\", \n                                    \"addr\": \"").concat(this.myAddr, "\", \n                                    \"query\": ").concat(query, " }"), eccoBoxName);
+                                this.dial("{\"eccoBoxClientId\": \"".concat(eccoBoxClientId, "\", \n                                    \"msgId\" : \"").concat(messageId, "\",\n                                    \"eccoBoxName\": \"").concat(eccoBoxName, "\", \n                                    \"addr\": \"").concat(this.myAddr, "\", \n                                    \"query\": ").concat(query, " }"), eccoBoxName)["catch"](function (err) { return console.error(err); });
                             }
                         }
                         return [2 /*return*/, "PLEASE WAIT"];
