@@ -436,7 +436,7 @@ export class p2pNode {
     //Prüft, ob ein Peer noch Teil des Netzes ist
     lookForLostPeer(node){
         return (peerId) => {
-            node.pubsub.publish("ORGA_LOST", peerId).catch(err => {
+            node.pubsub.publish("ORGA_LOST", fromString(peerId)).catch(err => {
                 console.error(err)
             })
         }        

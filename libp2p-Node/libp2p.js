@@ -559,7 +559,7 @@ var p2pNode = /** @class */ (function () {
     //Prüft, ob ein Peer noch Teil des Netzes ist
     p2pNode.prototype.lookForLostPeer = function (node) {
         return function (peerId) {
-            node.pubsub.publish("ORGA_LOST", peerId)["catch"](function (err) {
+            node.pubsub.publish("ORGA_LOST", fromString(peerId))["catch"](function (err) {
                 console.error(err);
             });
         };
