@@ -171,6 +171,14 @@ var p2pNode = /** @class */ (function () {
                                 console.error(e);
                             }
                         });
+                        //Falls eine verbindung abgebrochen wurde kann hier ein verlorener peer wiedergefunden werden
+                        //msg: peerId
+                        this.node.pubsub.subscribe("ORGA_LOST");
+                        this.node.pubsub.on("ORGA_LOST", function (msg) {
+                            if (_this.node.peerId.toB58String() == toString(msg.data)) {
+                                _this.announceMyself();
+                            }
+                        });
                         //Empfangen einer Query aus dem Netz
                         this.node.handle("/query/1.0.0", function (_a) {
                             var connection = _a.connection, stream = _a.stream, protocol = _a.protocol;
@@ -256,9 +264,6 @@ var p2pNode = /** @class */ (function () {
                             var connection = _a.connection, stream = _a.stream, protocol = _a.protocol;
                             return __awaiter(_this, void 0, void 0, function () {
                                 return __generator(this, function (_b) {
-                                    connection.on("error", function (err) {
-                                        console.log(err);
-                                    });
                                     try {
                                         pipe(stream.source, function (source) { return map(source, function (buf) { return toString(buf.slice()); }); }, function (source) {
                                             var source_2, source_2_1;
@@ -420,15 +425,18 @@ var p2pNode = /** @class */ (function () {
     //Auf erhaltene Query antworten
     p2pNode.prototype.response = function (adr, obj, n) {
         return __awaiter(this, void 0, void 0, function () {
+            var lookupReference_1, lookForPeerRef_1;
             return __generator(this, function (_a) {
                 try {
-                    //const { stream, protocol } = await 
+                    lookupReference_1 = this.lookupService;
+                    lookForPeerRef_1 = this.lookForLostPeer(this.node);
                     n.dialProtocol(multiaddr(adr), "/response/1.0.0").then(function (_a) {
                         var stream = _a.stream, protocol = _a.protocol;
-                        console.log(stream);
-                        console.log(protocol);
                         pipe(stream_1.Readable.from(obj), function (source) { return (map(source, function (string) { return fromString(string); })); }, stream.sink);
                     }, function (error) {
+                        var peerId = adr.substring(adr.lastIndexOf('/') + 1, adr.length);
+                        lookupReference_1.unregister(peerId);
+                        lookForPeerRef_1(peerId);
                         console.error(error);
                     });
                 }
@@ -524,18 +532,20 @@ var p2pNode = /** @class */ (function () {
     //An Peer im Netz eine Anfrage schicken
     p2pNode.prototype.dial = function (msg, eccoBoxName) {
         return __awaiter(this, void 0, void 0, function () {
+            var element_1, lookupReference_2, lookForPeerRef_2;
             return __generator(this, function (_a) {
                 try {
-                    //{ stream, protocol } = await 
-                    this.node.dialProtocol(this.lookupService.find(eccoBoxName)[0].maddr, "/query/1.0.0").then(function (_a) {
+                    element_1 = this.lookupService.find(eccoBoxName)[0];
+                    lookupReference_2 = this.lookupService;
+                    lookForPeerRef_2 = this.lookForLostPeer(this.node);
+                    this.node.dialProtocol(element_1.maddr, "/query/1.0.0").then(function (_a) {
                         var stream = _a.stream, protocol = _a.protocol;
-                        console.log(stream);
-                        console.log(protocol);
-                        /*stream.on('error', function(err){
-                            console.error(err)
-                        })*/
                         pipe(stream_1.Readable.from(msg), function (source) { return (map(source, function (string) { return fromString(string); })); }, stream.sink);
                     }, function (error) {
+                        //peer aus löschen und anfragen, ob dieser noch im netz ist
+                        var peerId = element_1.maddr.toString().substring(element_1.maddr.toString().lastIndexOf('/') + 1, element_1.maddr.toString().length);
+                        lookupReference_2.unregister(peerId);
+                        lookForPeerRef_2(peerId);
                         console.error(error);
                     });
                 }
@@ -545,6 +555,14 @@ var p2pNode = /** @class */ (function () {
                 return [2 /*return*/];
             });
         });
+    };
+    //Prüft, ob ein Peer noch Teil des Netzes ist
+    p2pNode.prototype.lookForLostPeer = function (node) {
+        return function (peerId) {
+            node.pubsub.publish("ORGA_LOST", peerId)["catch"](function (err) {
+                console.error(err);
+            });
+        };
     };
     return p2pNode;
 }());

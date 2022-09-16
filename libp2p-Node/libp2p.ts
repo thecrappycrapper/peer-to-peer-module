@@ -130,6 +130,15 @@ export class p2pNode {
             }
         })
 
+        //Falls eine verbindung abgebrochen wurde kann hier ein verlorener peer wiedergefunden werden
+        //msg: peerId
+        this.node.pubsub.subscribe("ORGA_LOST")
+        this.node.pubsub.on("ORGA_LOST", (msg) => {
+            if(this.node.peerId.toB58String() == toString(msg.data)){
+                this.announceMyself()
+            }
+        })
+
         //Empfangen einer Query aus dem Netz
         this.node.handle(`/query/1.0.0`, async ({ connection, stream, protocol }) => {
             let resp = this.response
@@ -185,9 +194,7 @@ export class p2pNode {
         //Antwort aus dem Netz an udsServer weiterleiten
         await this.listener
         this.node.handle(`/response/1.0.0`, async ({ connection, stream, protocol }) => {
-            connection.on("error", function(err){
-                console.log(err)
-            })
+
             try{
                 pipe(
                     stream.source,
@@ -265,11 +272,10 @@ export class p2pNode {
     //Auf erhaltene Query antworten
     async response(adr: String, obj: String, n: any) {
         try {
-            //const { stream, protocol } = await 
+            let lookupReference = this.lookupService
+            let lookForPeerRef = this.lookForLostPeer(this.node)
             n.dialProtocol(multiaddr(adr), `/response/1.0.0`).then(
                 function({stream, protocol}){
-                    console.log(stream)
-                    console.log(protocol)
                     pipe(
                         Readable.from(obj),
         
@@ -279,6 +285,9 @@ export class p2pNode {
                     )
                 },
                 function(error){
+                    let peerId = adr.substring(adr.lastIndexOf('/') + 1, adr.length)
+                    lookupReference.unregister(peerId)
+                    lookForPeerRef(peerId)
                     console.error(error)
                 }
             )
@@ -397,15 +406,11 @@ export class p2pNode {
     async dial(msg: String, eccoBoxName: String ) {
 
         try {
-            //{ stream, protocol } = await 
-            this.node.dialProtocol(this.lookupService.find(eccoBoxName)[0].maddr, `/query/1.0.0`).then(
+            let element = this.lookupService.find(eccoBoxName)[0]
+            let lookupReference = this.lookupService
+            let lookForPeerRef = this.lookForLostPeer(this.node)
+            this.node.dialProtocol(element.maddr, `/query/1.0.0`).then(
                 function({ stream, protocol }){
-                    console.log(stream)
-
-                    console.log(protocol)
-                    /*stream.on('error', function(err){
-                        console.error(err)
-                    })*/
                     pipe(
                         Readable.from(msg),
         
@@ -415,6 +420,10 @@ export class p2pNode {
                     )
                 },
                 function(error){
+                    //peer aus löschen und anfragen, ob dieser noch im netz ist
+                    let peerId = element.maddr.toString().substring(element.maddr.toString().lastIndexOf('/') + 1, element.maddr.toString().length)
+                    lookupReference.unregister(peerId)
+                    lookForPeerRef(peerId)
                     console.error(error)
                 }
             )
@@ -423,5 +432,13 @@ export class p2pNode {
             console.error("dialError " + e)
         }
 
+    }
+    //Prüft, ob ein Peer noch Teil des Netzes ist
+    lookForLostPeer(node){
+        return (peerId) => {
+            node.pubsub.publish("ORGA_LOST", peerId).catch(err => {
+                console.error(err)
+            })
+        }        
     }
 }
