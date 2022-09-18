@@ -267,7 +267,7 @@ export class clientClass {
     //Ausführender Edge Node Name: nicht pi
     Btest4remote(connection) {
         this.cycle(connection, this.send, (iterator) => {
-            return `{"type": "COMMMAND", 
+            return `{"type": "COMMAND", 
                     "msgId": "${uuidv4()}", 
                     "eccoBoxName": "pi", 
                     "command": ${JSON.stringify(["TS.ADD", "distanz",`${Date.now()}` ,(iterator).toString()])}}`

@@ -275,7 +275,7 @@ var clientClass = /** @class */ (function () {
     //Ausführender Edge Node Name: nicht pi
     clientClass.prototype.Btest4remote = function (connection) {
         this.cycle(connection, this.send, function (iterator) {
-            return "{\"type\": \"COMMMAND\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"pi\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "distanz", "".concat(Date.now()), (iterator).toString()]), "}");
+            return "{\"type\": \"COMMAND\", \n                    \"msgId\": \"".concat((0, uuid_1.v4)(), "\", \n                    \"eccoBoxName\": \"pi\", \n                    \"command\": ").concat(JSON.stringify(["TS.ADD", "distanz", "".concat(Date.now()), (iterator).toString()]), "}");
         }, 10);
     };
     //-----Status Test
