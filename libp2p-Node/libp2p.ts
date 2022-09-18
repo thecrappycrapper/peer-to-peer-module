@@ -51,6 +51,11 @@ export class p2pNode {
 
     public async init() {
 
+        process.on('uncaughtException', (error, source) => {
+            console.error(error)
+            console.error(source)
+        })
+
         let root = this
 
         //Einstellungen libp2p

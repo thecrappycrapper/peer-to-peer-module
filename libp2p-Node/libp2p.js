@@ -95,6 +95,10 @@ var p2pNode = /** @class */ (function () {
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
+                        process.on('uncaughtException', function (error, source) {
+                            console.error(error);
+                            console.error(source);
+                        });
                         root = this;
                         //Einstellungen libp2p
                         _a = this;
