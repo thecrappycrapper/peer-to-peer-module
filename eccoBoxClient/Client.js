@@ -115,6 +115,7 @@ var clientClass = /** @class */ (function () {
             }
             else {
                 (0, console_1.error)(err);
+                _this.checkForServer(true);
             }
         });
         client.on('close', function (hadError) {
