@@ -304,9 +304,7 @@ var p2pNode = /** @class */ (function () {
                                                             return [7 /*endfinally*/];
                                                         case 11: return [7 /*endfinally*/];
                                                         case 12:
-                                                            root.listener.respond(allData.toString())["catch"](function (err) {
-                                                                console.error(err);
-                                                            });
+                                                            root.listener.respond(allData.toString());
                                                             return [2 /*return*/];
                                                     }
                                                 });

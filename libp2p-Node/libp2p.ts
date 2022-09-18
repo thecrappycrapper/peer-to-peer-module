@@ -205,9 +205,7 @@ export class p2pNode {
                         for await (let chunk of source) {
                             allData += chunk.toString()
                         }
-                        root.listener.respond(allData.toString()).catch((err)=>{
-                            console.error(err)
-                        })
+                        root.listener.respond(allData.toString())
                     }
                 )
             }
