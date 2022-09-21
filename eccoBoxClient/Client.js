@@ -358,7 +358,7 @@ var clientClass = /** @class */ (function () {
                         _a.label = 2;
                     case 2:
                         if (!true) return [3 /*break*/, 6];
-                        return [4 /*yield*/, sleep(100)];
+                        return [4 /*yield*/, sleep(4000)];
                     case 3:
                         _a.sent();
                         console.log("Now getting the last 2s of Data at Node ".concat(currNodeNumber % 5 + 1));
@@ -448,7 +448,7 @@ var clientClass = /** @class */ (function () {
                         _a.label = 4;
                     case 4:
                         if (!(sensorNumber <= ((nodeNumber == 0) ? 3 : 5))) return [3 /*break*/, 9];
-                        return [4 /*yield*/, sleep(100)];
+                        return [4 /*yield*/, sleep(4000)];
                     case 5:
                         _a.sent();
                         console.log("Now getting the last 2s of Data at Node ".concat(nodeNumber));

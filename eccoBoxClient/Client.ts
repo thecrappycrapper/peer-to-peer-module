@@ -384,7 +384,7 @@ export class clientClass {
 
         let currNodeNumber = 0
         while(true){
-            await sleep(100)
+            await sleep(4000)
             console.log(`Now getting the last 2s of Data at Node ${currNodeNumber%5 + 1}`)
             this.send(`
                 {"type": "COMMAND", 
@@ -502,7 +502,7 @@ export class clientClass {
         while(true){
             for(let nodeNumber = 1; nodeNumber <= 2; nodeNumber++){
                 for(let sensorNumber = 1; sensorNumber <= ((nodeNumber == 0)? 3 : 5); sensorNumber++ ){
-                    await sleep(100)
+                    await sleep(4000)
                     console.log(`Now getting the last 2s of Data at Node ${nodeNumber}`)
                     this.send(`
                         {"type": "COMMAND", 
