@@ -447,7 +447,7 @@ var clientClass = /** @class */ (function () {
                         sensorNumber = 1;
                         _a.label = 4;
                     case 4:
-                        if (!(sensorNumber <= ((nodeNumber == 0) ? 3 : 5))) return [3 /*break*/, 9];
+                        if (!(sensorNumber <= ((nodeNumber == 1) ? 3 : 5))) return [3 /*break*/, 9];
                         return [4 /*yield*/, sleep(4000)];
                     case 5:
                         _a.sent();

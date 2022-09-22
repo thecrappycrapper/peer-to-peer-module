@@ -501,7 +501,7 @@ export class clientClass {
 
         while(true){
             for(let nodeNumber = 1; nodeNumber <= 2; nodeNumber++){
-                for(let sensorNumber = 1; sensorNumber <= ((nodeNumber == 0)? 3 : 5); sensorNumber++ ){
+                for(let sensorNumber = 1; sensorNumber <= ((nodeNumber == 1)? 3 : 5); sensorNumber++ ){
                     await sleep(4000)
                     console.log(`Now getting the last 2s of Data at Node ${nodeNumber}`)
                     this.send(`
